@@ -1,0 +1,24 @@
+{
+  "name": "JalDrishti(H₂O) - Smart Water System",
+  "short_name": "JalDrishti(H₂O)",
+  "description": "IoT Water Purification & Quality Monitoring System for Mining Belts",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3105/3105807.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3105/3105807.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
