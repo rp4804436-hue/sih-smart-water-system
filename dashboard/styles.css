@@ -227,3 +227,23 @@ body.dark-mode .menu-label {
         box-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
     }
 }
+/* FORCE VISIBILITY FOR ALL INNER CARD LABELS AND UNITS IN DARK MODE */
+body.dark-mode .stat-card span,
+body.dark-mode .stat-card small,
+body.dark-mode .stat-card div:not(.danger-periphery) {
+    color: #cbd5e1 !important; /* Crisp light slate */
+}
+
+/* Brighten the main numeric values and benchmark badges */
+body.dark-mode .stat-card h3,
+body.dark-mode .stat-card .fs-2,
+body.dark-mode .stat-card .fw-bold {
+    color: #ffffff !important;
+}
+
+/* Specific styling for the target threshold text on the right */
+body.dark-mode .stat-card .text-muted,
+body.dark-mode .stat-card small.text-muted {
+    color: #94a3b8 !important;
+    opacity: 0.9 !important;
+}
