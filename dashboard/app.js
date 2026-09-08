@@ -687,6 +687,8 @@ async function fetchLiveTelemetry() {
       document.getElementById('cardTds').innerText = tds;
       document.getElementById('cardTemp').innerText = temp.toFixed(1);
 
+      applyPeripheryThresholds({ wqi: calculatedWqi, iron: fe, ph: ph, turbidity: turb, tds: tds, temperature: temp });
+
       const banner = document.getElementById('alertBanner');
       const statusText = document.getElementById('statusText');
       const modeBadge = document.getElementById('modeBadge');
@@ -854,6 +856,86 @@ async function fetchLiveTelemetry() {
     }
   } catch (error) {
     console.error("Telemetry sync error:", error);
+  }
+}
+function applyPeripheryThresholds(data) {
+  // Target the outer .stat-card container
+  const getContainer = (elemId) => {
+    const el = document.getElementById(elemId);
+    return el ? (el.closest('.stat-card') || el.closest('.card') || el.parentElement) : null;
+  };
+
+  const cardWqi = getContainer('cardWqi');
+  const cardFe = getContainer('cardIron');
+  const cardPh = getContainer('cardPh');
+  const cardTurb = getContainer('cardTurb');
+  const cardTds = getContainer('cardTds');
+  const cardTemp = getContainer('cardTemp');
+
+  // 1. Water Quality Index (Safe >= 70)
+  if (cardWqi) {
+    if (data.wqi < 70) {
+      cardWqi.classList.add('danger-periphery');
+      cardWqi.classList.remove('safe-periphery');
+    } else {
+      cardWqi.classList.remove('danger-periphery');
+      cardWqi.classList.add('safe-periphery');
+    }
+  }
+
+  // 2. Dissolved Iron (IS 10500 standard: <= 0.30 mg/L)
+  if (cardFe) {
+    if (data.iron > 0.30) {
+      cardFe.classList.add('danger-periphery');
+      cardFe.classList.remove('safe-periphery');
+    } else {
+      cardFe.classList.remove('danger-periphery');
+      cardFe.classList.add('safe-periphery');
+    }
+  }
+
+  // 3. pH Level (IS 10500 standard: 6.5 to 8.5)
+  if (cardPh) {
+    if (data.ph < 6.5 || data.ph > 8.5) {
+      cardPh.classList.add('danger-periphery');
+      cardPh.classList.remove('safe-periphery');
+    } else {
+      cardPh.classList.remove('danger-periphery');
+      cardPh.classList.add('safe-periphery');
+    }
+  }
+
+  // 4. Turbidity (IS 10500 standard: <= 5.0 NTU)
+  if (cardTurb) {
+    if (data.turbidity > 5.0) {
+      cardTurb.classList.add('danger-periphery');
+      cardTurb.classList.remove('safe-periphery');
+    } else {
+      cardTurb.classList.remove('danger-periphery');
+      cardTurb.classList.add('safe-periphery');
+    }
+  }
+
+  // 5. TDS Level (IS 10500 standard: <= 500 PPM)
+  if (cardTds) {
+    if (data.tds > 500) {
+      cardTds.classList.add('danger-periphery');
+      cardTds.classList.remove('safe-periphery');
+    } else {
+      cardTds.classList.remove('danger-periphery');
+      cardTds.classList.add('safe-periphery');
+    }
+  }
+
+  // 6. Temperature (Upper limit: <= 35.0 C)
+  if (cardTemp) {
+    if (data.temperature > 35.0) {
+      cardTemp.classList.add('danger-periphery');
+      cardTemp.classList.remove('safe-periphery');
+    } else {
+      cardTemp.classList.remove('danger-periphery');
+      cardTemp.classList.add('safe-periphery');
+    }
   }
 }
 
