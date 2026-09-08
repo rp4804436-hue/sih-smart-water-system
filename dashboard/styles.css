@@ -173,3 +173,57 @@ body.dark-mode .table-light {
   min-height: 42px;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+/* ============================================================
+   DARK MODE CONTRAST & VISIBILITY ENHANCEMENTS
+   ============================================================ */
+body.dark-mode .sub-header,
+body.dark-mode .cluster-label,
+body.dark-mode .unit,
+body.dark-mode .threshold-label,
+body.dark-mode .card-unit,
+body.dark-mode .metric-unit,
+body.dark-mode .subtext,
+body.dark-mode .stream-step span,
+body.dark-mode .stream-step p,
+body.dark-mode .stream-label,
+body.dark-mode small {
+    color: #94a3b8 !important; /* High-contrast cool slate gray */
+}
+
+body.dark-mode .card-title,
+body.dark-mode .metric-title,
+body.dark-mode h4,
+body.dark-mode h5 {
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .modal-section-title,
+body.dark-mode .menu-label {
+    color: #cbd5e1 !important;
+}
+
+/* ============================================================
+   IS 10500 PERIPHERY DANGER OUTLINE (PULSING RED BORDER)
+   ============================================================ */
+.danger-periphery {
+    border: 2px solid #ef4444 !important;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.45) !important;
+    animation: danger-pulse 2s infinite ease-in-out;
+}
+
+.safe-periphery {
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+}
+
+@keyframes danger-pulse {
+    0% {
+        box-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 16px rgba(239, 68, 68, 0.7);
+    }
+    100% {
+        box-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
+    }
+}
