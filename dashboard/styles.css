@@ -247,3 +247,86 @@ body.dark-mode .stat-card small.text-muted {
     color: #94a3b8 !important;
     opacity: 0.9 !important;
 }
+/* ============================================================
+   GLOBAL DARK MODE CONTRAST OVERRIDES
+   ============================================================ */
+
+/* 1. Closed-Loop Hydraulic Stream */
+body.dark-mode .schematic-node {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+body.dark-mode .schematic-node small,
+body.dark-mode .schematic-node span {
+  color: #94a3b8 !important;
+}
+body.dark-mode .stream-subtext,
+body.dark-mode .pipe-track-labels span,
+body.dark-mode small.text-muted {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+/* 2. Stat Cards: Labels, Units, and Thresholds */
+body.dark-mode .stat-card {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+body.dark-mode .stat-card h1,
+body.dark-mode .stat-card h2,
+body.dark-mode .stat-card h3,
+body.dark-mode .stat-card h4,
+body.dark-mode .stat-card .fs-2,
+body.dark-mode .stat-card .fw-bold {
+  color: #ffffff !important;
+}
+body.dark-mode .stat-card span,
+body.dark-mode .stat-card small,
+body.dark-mode .stat-card .text-muted,
+body.dark-mode .stat-card .metric-unit,
+body.dark-mode .stat-card .threshold-label {
+  color: #cbd5e1 !important; /* High-contrast cool silver */
+  opacity: 1 !important;
+}
+
+/* 3. Predictive Health Warning & Outbreak Card */
+body.dark-mode .health-card,
+body.dark-mode [id*="Health"],
+body.dark-mode [id*="health"],
+body.dark-mode .border-warning {
+  background-color: #1e293b !important;
+  border-color: #eab308 !important;
+}
+body.dark-mode .health-card h5,
+body.dark-mode .health-card h6,
+body.dark-mode .health-card span,
+body.dark-mode .health-card small,
+body.dark-mode #txtHealthHeader,
+body.dark-mode #txtToxicRiskTitle,
+body.dark-mode #txtPathogenRiskTitle,
+body.dark-mode #riskTextToxic,
+body.dark-mode #riskTextPathogen {
+  color: #f1f5f9 !important;
+}
+
+/* 4. Chart Cards & Subtitles */
+body.dark-mode .chart-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+body.dark-mode .chart-card h5,
+body.dark-mode .chart-card h6 {
+  color: #f8fafc !important;
+}
+body.dark-mode .chart-card small,
+body.dark-mode .chart-card p {
+  color: #94a3b8 !important;
+}
+
+/* 5. General Subtitles & Badges */
+body.dark-mode #txtHeaderSubtitle,
+body.dark-mode #txtRecordsSubtitle,
+body.dark-mode #txtGisActiveNode {
+  color: #cbd5e1 !important;
+}

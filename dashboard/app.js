@@ -115,6 +115,30 @@ function toggleTheme() {
     label.innerText = isDark ? 'On' : 'Off';
     label.className = isDark ? 'badge bg-success' : 'badge bg-secondary';
   }
+
+  // Update Chart.js canvas text & grid lines dynamically
+  const textColor = isDark ? '#cbd5e1' : '#64748b';
+  const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+
+  [wqiTrendChart, lineComparisonChart, statusPieChart].forEach(chart => {
+    if (!chart) return;
+    
+    // Update legend font colors
+    if (chart.options.plugins && chart.options.plugins.legend) {
+      chart.options.plugins.legend.labels.color = textColor;
+    }
+    
+    // Update axis tick & grid colors
+    if (chart.options.scales) {
+      Object.keys(chart.options.scales).forEach(scaleKey => {
+        const scale = chart.options.scales[scaleKey];
+        if (scale.ticks) scale.ticks.color = textColor;
+        if (scale.grid) scale.grid.color = gridColor;
+        if (scale.title) scale.title.color = textColor;
+      });
+    }
+    chart.update();
+  });
 }
 
 function dispatchWhatsAppAlert() {
