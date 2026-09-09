@@ -228,10 +228,14 @@ function toggleLanguage() {
   document.getElementById('txtCardTemp').innerText = t.temp;
   document.getElementById('txtCardTempActive').innerText = t.active;
 
-  document.getElementById('txtRoiHeader').innerText = t.roiHeader;
-  document.getElementById('txtCostPerLitre').innerText = t.costPerLitre;
-  document.getElementById('txtTankerBenchmark').innerText = t.tankerBenchmark;
-  document.getElementById('txtNetSavings').innerText = t.netSavings;
+ const elRoiHeader = document.getElementById('txtRoiHeader');
+  if (elRoiHeader) elRoiHeader.innerText = t.roiHeader;
+  const elCostPerLitre = document.getElementById('txtCostPerLitre');
+  if (elCostPerLitre) elCostPerLitre.innerText = t.costPerLitre;
+  const elTankerBenchmark = document.getElementById('txtTankerBenchmark');
+  if (elTankerBenchmark) elTankerBenchmark.innerText = t.tankerBenchmark;
+  const elNetSavings = document.getElementById('txtNetSavings');
+  if (elNetSavings) elNetSavings.innerText = t.netSavings;
   document.getElementById('txtFilterHeader').innerText = t.filterHeader;
   document.getElementById('txtFilterBed').innerText = t.filterBed;
   document.getElementById('txtFilterUv').innerText = t.filterUv;

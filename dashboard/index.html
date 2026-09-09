@@ -180,10 +180,10 @@
       </div>
     </div>
   </div>
-<!-- ================= SMART FEATURE CARDS (1, 5, 6) ================= -->
+<!-- ================= SMART FEATURE CARDS (1 & 5) ================= -->
   <div class="row g-2 mb-3">
     <!-- Feature 1: Stoichiometric Lime Dispenser -->
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-6">
       <div class="stat-card p-3 h-100">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <span class="fw-bold fs-6">AMD Neutralization (Lime Dosing)</span>
@@ -198,7 +198,7 @@
     </div>
 
     <!-- Feature 5: Multi-Heavy Metal Proxy Model -->
-    <div class="col-12 col-md-5">
+    <div class="col-12 col-md-6">
       <div class="stat-card p-3 h-100">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <span class="fw-bold fs-6">Surrogate Metal Proxies (IS 10500)</span>
@@ -218,50 +218,34 @@
         </div>
       </div>
     </div>
-
-    <!-- Feature 6: Voice Advisory / IVR Broadcast -->
-    <div class="col-12 col-md-3">
-      <div class="stat-card p-3 h-100 d-flex flex-column justify-content-between">
+  </div>
+ <!-- Predictive Filter Life Row (Full Width) -->
+  <div class="row g-2 mb-3">
+    <div class="col-12">
+      <div class="chart-card shadow-sm p-3 h-100 border-start border-4 border-primary">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <span class="fw-bold fs-6">Panchayat IVRS Voice</span>
-          <span class="badge bg-danger" id="voiceStatusBadge">Audio Ready</span>
+          <h6 id="txtFilterHeader" class="fw-bold mb-0 text-primary" style="font-size: 0.85rem;">Predictive Filter & Consumable Life</h6>
+          <span class="badge bg-primary-subtle text-primary">Proactive</span>
         </div>
-        <p class="small text-muted mb-2">Broadcast water advisory via Web Speech API in Hindi or English.</p>
-        <button class="btn btn-sm btn-outline-info w-100 fw-bold" onclick="playPanchayatVoiceAdvisory()">
-          📢 Play Voice Advisory
-        </button>
+        <div class="mt-2">
+          <div class="d-flex justify-content-between mb-1">
+            <small id="txtFilterBed" class="fw-semibold text-truncate" style="font-size: 0.72rem;">Greensand & Activated Carbon Bed</small>
+            <small id="filterLifeText" class="text-muted fw-bold ps-1" style="font-size: 0.72rem;">78% Remaining</small>
+          </div>
+          <div class="progress mb-2" style="height: 6px;">
+            <div id="filterLifeBar" class="progress-bar bg-info" role="progressbar" style="width: 78%;"></div>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <small id="txtFilterUv" class="fw-semibold text-truncate" style="font-size: 0.72rem;">Inline UV-C Disinfection Lamp</small>
+            <small class="text-muted fw-bold ps-1" style="font-size: 0.72rem;">1,420 / 2,000 hrs</small>
+          </div>
+          <div class="progress" style="height: 6px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 71%;"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- Unit Economics & Predictive Maintenance Row -->
-  <div class="row g-2 mb-3">
-    <!-- Economic ROI Card -->
-    <div class="col-12 col-md-6">
-      <div class="chart-card shadow-sm p-3 h-100 border-start border-4 border-success">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 id="txtRoiHeader" class="fw-bold mb-0 text-success" style="font-size: 0.85rem;">Unit Economics & Community ROI</h6>
-          <span class="badge bg-success-subtle text-success">Live Rate</span>
-        </div>
-        <div class="row text-center mt-2 g-1">
-          <div class="col-4 border-end">
-            <small id="txtCostPerLitre" class="text-muted d-block" style="font-size: 0.68rem;">Purification Cost</small>
-            <h5 class="fw-bold mb-0">₹0.14</h5>
-            <small class="text-muted" style="font-size: 0.62rem;">Per Liter</small>
-          </div>
-          <div class="col-4 border-end">
-            <small id="txtTankerBenchmark" class="text-muted d-block" style="font-size: 0.68rem;">Tanker Supply</small>
-            <h5 class="fw-bold text-muted mb-0">₹1.20</h5>
-            <small class="text-muted" style="font-size: 0.62rem;">Benchmark</small>
-          </div>
-          <div class="col-4">
-            <small id="txtNetSavings" class="text-muted d-block" style="font-size: 0.68rem;">Net Savings</small>
-            <h5 class="fw-bold text-success mb-0">88.3%</h5>
-            <small class="text-success fw-semibold" style="font-size: 0.62rem;">₹1.06/L Saved</small>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Predictive Filter Life Card -->
     <div class="col-12 col-md-6">
