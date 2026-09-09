@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jaldrishti-cache-v18';
+const CACHE_NAME = 'jaldrishti-cache-v19';
 const ASSETS_TO_CACHE = [
   '/',
   '/styles.css',
