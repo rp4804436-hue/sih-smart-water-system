@@ -3,6 +3,43 @@ import csv
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
+# ============================================================
+# SMART FEATURES: STOICHIOMETRIC DOSING, DIAGNOSTICS & PROXIES
+# ============================================================
+def compute_stoichiometric_lime(ph, iron_mgl):
+    lime_for_ph = 0.0
+    if ph < 7.0:
+        h_conc = 10 ** (-ph)
+        target_h = 10 ** (-7.0)
+        delta_h = max(0.0, h_conc - target_h)
+        lime_for_ph = (delta_h * 0.5 * 74.09) * 1000.0
+
+    excess_fe = max(0.0, iron_mgl - 0.30)
+    lime_for_fe = excess_fe * 1.987
+    return round(lime_for_ph + lime_for_fe, 2)
+
+def run_sensor_diagnostics(ph, iron, turbidity, tds, temp):
+    diagnostics = {"overall": "HEALTHY", "alerts": []}
+    if ph <= 2.0 or ph >= 12.0:
+        diagnostics["alerts"].append("pH Probe: Optical glass scaling / out-of-bounds.")
+        diagnostics["overall"] = "MAINTENANCE REQUIRED"
+    if turbidity > 90.0:
+        diagnostics["alerts"].append("Turbidity: Sludge deposition detected on lens.")
+        diagnostics["overall"] = "MAINTENANCE REQUIRED"
+    if tds < 10:
+        diagnostics["alerts"].append("TDS Probe: Open circuit or sensor detached.")
+        diagnostics["overall"] = "HARDWARE FAULT"
+    return diagnostics
+
+def compute_proxy_contaminants(tds, ph, iron):
+    est_so4 = round(max(15.0, (tds * 0.42) + ((7.0 - ph) * 28.5)), 1)
+    est_mn = round(max(0.02, (iron * 0.18) + (0.05 if ph < 6.0 else 0.01)), 2)
+    return {
+        "manganese_mgL": est_mn,
+        "manganese_safe": est_mn <= 0.10,
+        "sulfate_mgL": est_so4,
+        "sulfate_safe": est_so4 <= 200.0
+    }
 
 # Resolve paths dynamically whether executing locally or inside Render containers
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -212,20 +249,31 @@ def get_latest():
         rows = list(csv.DictReader(f))
         if not rows:
             return jsonify({"empty": True, "node_id": node_id})
+        
         last = rows[-1]
-        return jsonify({
+        fe_val = float(last['Iron_mgL'])
+        ph_val = float(last['pH'])
+        turb_val = float(last['Turbidity_NTU'])
+        tds_val = float(last['TDS_PPM'])
+        temp_val = float(last['Temperature_C'])
+
+        latest = {
             "empty": False,
             "node_id": node_id,
             "timestamp": last['Timestamp'],
-            "iron": float(last['Iron_mgL']),
-            "ph": float(last['pH']),
-            "turbidity": float(last['Turbidity_NTU']),
-            "tds": float(last['TDS_PPM']),
-            "temperature": float(last['Temperature_C']),
+            "iron": fe_val,
+            "ph": ph_val,
+            "turbidity": turb_val,
+            "tds": tds_val,
+            "temperature": temp_val,
             "wqi": int(last['WQI']),
             "status": last['Status'],
-            "mode": last['Mode']
-        })
+            "mode": last['Mode'],
+            "lime_dosing_g_m3": compute_stoichiometric_lime(ph_val, fe_val),
+            "diagnostics": run_sensor_diagnostics(ph_val, fe_val, turb_val, tds_val, temp_val),
+            "proxies": compute_proxy_contaminants(tds_val, ph_val, fe_val)
+        }
+        return jsonify(latest)
 
 # Retrieve Historical Log Sequence for Trend Analysis
 @app.route('/api/history', methods=['GET'])

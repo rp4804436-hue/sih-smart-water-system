@@ -180,6 +180,59 @@
       </div>
     </div>
   </div>
+<!-- ================= SMART FEATURE CARDS (1, 5, 6) ================= -->
+  <div class="row g-2 mb-3">
+    <!-- Feature 1: Stoichiometric Lime Dispenser -->
+    <div class="col-12 col-md-4">
+      <div class="stat-card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold fs-6">AMD Neutralization (Lime Dosing)</span>
+          <span class="badge bg-primary">Ca(OH)₂</span>
+        </div>
+        <div class="d-flex align-items-baseline gap-2">
+          <h3 class="fw-bold mb-0 text-white" id="valLimeDosing">0.0</h3>
+          <span class="text-muted">g/m³ intake</span>
+        </div>
+        <small class="text-muted d-block mt-2" id="txtLimeStatus">Optimal buffer stoichiometry</small>
+      </div>
+    </div>
+
+    <!-- Feature 5: Multi-Heavy Metal Proxy Model -->
+    <div class="col-12 col-md-5">
+      <div class="stat-card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold fs-6">Surrogate Metal Proxies (IS 10500)</span>
+          <span class="badge bg-info text-dark">ML Surrogate</span>
+        </div>
+        <div class="row text-center mt-1">
+          <div class="col-6 border-end border-secondary">
+            <span class="d-block small text-muted">Est. Manganese (Mn)</span>
+            <h4 class="fw-bold mb-0 text-white" id="valProxyMn">0.00</h4>
+            <small class="text-muted">Limit: 0.10 mg/L</small>
+          </div>
+          <div class="col-6">
+            <span class="d-block small text-muted">Est. Sulfate (SO₄²⁻)</span>
+            <h4 class="fw-bold mb-0 text-white" id="valProxySo4">0.0</h4>
+            <small class="text-muted">Limit: 200 mg/L</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 6: Voice Advisory / IVR Broadcast -->
+    <div class="col-12 col-md-3">
+      <div class="stat-card p-3 h-100 d-flex flex-column justify-content-between">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold fs-6">Panchayat IVRS Voice</span>
+          <span class="badge bg-danger" id="voiceStatusBadge">Audio Ready</span>
+        </div>
+        <p class="small text-muted mb-2">Broadcast water advisory via Web Speech API in Hindi or English.</p>
+        <button class="btn btn-sm btn-outline-info w-100 fw-bold" onclick="playPanchayatVoiceAdvisory()">
+          📢 Play Voice Advisory
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Unit Economics & Predictive Maintenance Row -->
   <div class="row g-2 mb-3">

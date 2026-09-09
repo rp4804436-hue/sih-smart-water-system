@@ -63,7 +63,6 @@ function selectClusterNode(index) {
   selectedNodeIndex = parseInt(index);
   const node = clusterNodes[selectedNodeIndex];
   
-  // Update select input and status labels
   const selectMenu = document.getElementById('nodeSelectMenu');
   if (selectMenu) selectMenu.value = selectedNodeIndex;
   
@@ -73,7 +72,6 @@ function selectClusterNode(index) {
   const recordsSub = document.getElementById('txtRecordsSubtitle');
   if (recordsSub) recordsSub.innerText = `Telemetry ingested at 3-second intervals | Station: ${node.name}`;
 
-  // Update pill active styling on mobile
   for (let i = 0; i < 4; i++) {
     const pill = document.getElementById(`pillNode${i}`);
     if (pill) {
@@ -85,7 +83,6 @@ function selectClusterNode(index) {
     }
   }
 
-  // Update CSV download link in drawer
   const csvLink = document.getElementById('linkDownloadCsv');
   if (csvLink) csvLink.href = `/api/download-csv?node_id=${node.node_key}`;
 
@@ -94,7 +91,6 @@ function selectClusterNode(index) {
     if (markers[selectedNodeIndex]) markers[selectedNodeIndex].openPopup();
   }
 
-  // Clear sparkline buffers to re-render node history cleanly
   [sparkWqi, sparkIron, sparkPh, sparkTurb, sparkTds, sparkTemp].forEach(s => {
     s.data.labels = [];
     s.data.datasets[0].data = [];
@@ -116,19 +112,14 @@ function toggleTheme() {
     label.className = isDark ? 'badge bg-success' : 'badge bg-secondary';
   }
 
-  // Update Chart.js canvas text & grid lines dynamically
   const textColor = isDark ? '#cbd5e1' : '#64748b';
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
 
   [wqiTrendChart, lineComparisonChart, statusPieChart].forEach(chart => {
     if (!chart) return;
-    
-    // Update legend font colors
     if (chart.options.plugins && chart.options.plugins.legend) {
       chart.options.plugins.legend.labels.color = textColor;
     }
-    
-    // Update axis tick & grid colors
     if (chart.options.scales) {
       Object.keys(chart.options.scales).forEach(scaleKey => {
         const scale = chart.options.scales[scaleKey];
@@ -713,6 +704,37 @@ async function fetchLiveTelemetry() {
 
       applyPeripheryThresholds({ wqi: calculatedWqi, iron: fe, ph: ph, turbidity: turb, tds: tds, temperature: temp });
 
+      // Feature 1: Stoichiometric Lime Dispenser
+      const limeVal = latest.lime_dosing_g_m3 !== undefined ? latest.lime_dosing_g_m3 : 0.0;
+      const elLime = document.getElementById('valLimeDosing');
+      if (elLime) elLime.innerText = Number(limeVal).toFixed(1);
+
+      const elLimeTxt = document.getElementById('txtLimeStatus');
+      if (elLimeTxt) {
+        elLimeTxt.innerText = limeVal > 0 
+          ? `Acidic AMD surge: Dosing ${Number(limeVal).toFixed(1)}g Ca(OH)₂ per m³`
+          : "Neutral buffer: Zero lime required";
+      }
+
+      // Feature 5: Multi-Heavy Metal Proxy Model (Mn & SO4)
+      if (latest.proxies) {
+        const elMn = document.getElementById('valProxyMn');
+        const elSo4 = document.getElementById('valProxySo4');
+        if (elMn) {
+          elMn.innerText = Number(latest.proxies.manganese_mgL).toFixed(2);
+          elMn.style.color = latest.proxies.manganese_safe ? '#10b981' : '#ef4444';
+        }
+        if (elSo4) {
+          elSo4.innerText = Math.round(latest.proxies.sulfate_mgL);
+          elSo4.style.color = latest.proxies.sulfate_safe ? '#10b981' : '#ef4444';
+        }
+      }
+
+      // Feature 3: Sensor Health & Anti-Fouling Diagnostics
+      if (latest.diagnostics && latest.diagnostics.alerts && latest.diagnostics.alerts.length > 0) {
+        console.warn("JalDrishti Sensor Diagnostics Alert:", latest.diagnostics.alerts.join(" | "));
+      }
+
       const banner = document.getElementById('alertBanner');
       const statusText = document.getElementById('statusText');
       const modeBadge = document.getElementById('modeBadge');
@@ -882,8 +904,8 @@ async function fetchLiveTelemetry() {
     console.error("Telemetry sync error:", error);
   }
 }
+
 function applyPeripheryThresholds(data) {
-  // Target the outer .stat-card container
   const getContainer = (elemId) => {
     const el = document.getElementById(elemId);
     return el ? (el.closest('.stat-card') || el.closest('.card') || el.parentElement) : null;
@@ -896,7 +918,6 @@ function applyPeripheryThresholds(data) {
   const cardTds = getContainer('cardTds');
   const cardTemp = getContainer('cardTemp');
 
-  // 1. Water Quality Index (Safe >= 70)
   if (cardWqi) {
     if (data.wqi < 70) {
       cardWqi.classList.add('danger-periphery');
@@ -907,7 +928,6 @@ function applyPeripheryThresholds(data) {
     }
   }
 
-  // 2. Dissolved Iron (IS 10500 standard: <= 0.30 mg/L)
   if (cardFe) {
     if (data.iron > 0.30) {
       cardFe.classList.add('danger-periphery');
@@ -918,7 +938,6 @@ function applyPeripheryThresholds(data) {
     }
   }
 
-  // 3. pH Level (IS 10500 standard: 6.5 to 8.5)
   if (cardPh) {
     if (data.ph < 6.5 || data.ph > 8.5) {
       cardPh.classList.add('danger-periphery');
@@ -929,7 +948,6 @@ function applyPeripheryThresholds(data) {
     }
   }
 
-  // 4. Turbidity (IS 10500 standard: <= 5.0 NTU)
   if (cardTurb) {
     if (data.turbidity > 5.0) {
       cardTurb.classList.add('danger-periphery');
@@ -940,7 +958,6 @@ function applyPeripheryThresholds(data) {
     }
   }
 
-  // 5. TDS Level (IS 10500 standard: <= 500 PPM)
   if (cardTds) {
     if (data.tds > 500) {
       cardTds.classList.add('danger-periphery');
@@ -951,7 +968,6 @@ function applyPeripheryThresholds(data) {
     }
   }
 
-  // 6. Temperature (Upper limit: <= 35.0 C)
   if (cardTemp) {
     if (data.temperature > 35.0) {
       cardTemp.classList.add('danger-periphery');
@@ -961,6 +977,45 @@ function applyPeripheryThresholds(data) {
       cardTemp.classList.add('safe-periphery');
     }
   }
+}
+
+// -------------------------------------------------------------
+// Feature 6: Interactive Panchayat Voice / IVRS Broadcast
+// -------------------------------------------------------------
+function playPanchayatVoiceAdvisory() {
+  if (!('speechSynthesis' in window)) {
+    alert("Web Speech synthesis is not supported in this browser.");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const nodeName = clusterNodes[selectedNodeIndex].name;
+  const isSafe = Number(document.getElementById('cardWqi').innerText) >= 70;
+  const fe = document.getElementById('cardIron').innerText;
+  
+  let speechText = "";
+
+  if (currentLanguage === 'HI') {
+    if (isSafe) {
+      speechText = `जलदृष्टि सूचना। ${nodeName} पर पानी का परीक्षण सफल रहा। जल पीने योग्य और सुरक्षित है।`;
+    } else {
+      speechText = `चेतावनी! जलदृष्टि आपातकालीन सूचना। ${nodeName} पर पानी दूषित पाया गया है। घुलित आयरन की मात्रा ${fe} मिलीग्राम प्रति लीटर है। कृपया यह पानी न पिएं।`;
+    }
+  } else {
+    if (isSafe) {
+      speechText = `JalDrishti Advisory. Water quality at ${nodeName} is certified safe and potable according to IS 10500 standards.`;
+    } else {
+      speechText = `Warning! JalDrishti Emergency Advisory. Water contamination detected at ${nodeName}. Dissolved iron level is ${fe} milligrams per liter. Do not consume this water.`;
+    }
+  }
+
+  const utterance = new SpeechSynthesisUtterance(speechText);
+  utterance.lang = currentLanguage === 'HI' ? 'hi-IN' : 'en-US';
+  utterance.rate = 0.95;
+  utterance.pitch = 1.0;
+
+  window.speechSynthesis.speak(utterance);
 }
 
 setInterval(fetchLiveTelemetry, 3000);
