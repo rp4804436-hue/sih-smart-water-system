@@ -12,6 +12,7 @@ const detailModal = new bootstrap.Modal(document.getElementById('metricDetailMod
 const diagnosticsModal = new bootstrap.Modal(document.getElementById('diagnosticsModal'));
 const recordsModal = new bootstrap.Modal(document.getElementById('recordsModal'));
 const gisModal = new bootstrap.Modal(document.getElementById('gisModal'));
+const roiModal = new bootstrap.Modal(document.getElementById('roiModal'));
 
 // -------------------------------------------------------------
 // 1. GIS Multi-Node Registry with Routing Keys
@@ -171,7 +172,11 @@ const i18n = {
     filterHeader: "Predictive Filter & Consumable Life", filterBed: "Greensand & Activated Carbon Bed", filterUv: "Inline UV-C Disinfection Lamp",
     trendHeader: "Water Quality Index (WQI) vs Time", trendSub: "Longitudinal trend derived via IS 10500 weighted sub-indices",
     traceHeader: "Live Parameter Traces vs Thresholds", donutHeader: "Water Usability Ratio",
-    drinkable: "Drinkable / Household", agriculture: "Agriculture Purpose", unusable: "Unusable / Undrinkable"
+    drinkable: "Drinkable / Household", agriculture: "Agriculture Purpose", unusable: "Unusable / Undrinkable",
+    menuVoiceTitle: "Panchayat IVRS Voice",
+    menuVoiceSub: "Broadcast audio water advisory",
+    menuRoiTitle: "Unit Economics & ROI",
+    menuRoiSub: "Treatment vs tanker cost metrics"
   },
   HI: {
     headerSub: "एसआईएच 26040 | खनन एवं ग्रामीण जल टेलीमेट्री एज नोड",
@@ -186,7 +191,11 @@ const i18n = {
     filterHeader: "फ़िल्टर आयु एवं पूर्वानुमान", filterBed: "ग्रीनसैंड व चारकोल बेड", filterUv: "यूवी-सी कीटाणुशोधन लैंप",
     trendHeader: "जल गुणवत्ता सूचकांक (समय अनुसार)", trendSub: "IS 10500 मानकों पर आधारित प्रवृत्तियां",
     traceHeader: "लाइव मापदंड एवं सीमा तुलना", donutHeader: "जल उपयोगिता अनुपात",
-    drinkable: "पीने योग्य / घरेलू उपयोग", agriculture: "कृषि सिंचाई हेतु", unusable: "दूषित / अनुपयोगी"
+    drinkable: "पीने योग्य / घरेलू उपयोग", agriculture: "कृषि सिंचाई हेतु", unusable: "दूषित / अनुपयोगी",
+    menuVoiceTitle: "पंचायत IVRS ध्वनि संदेश",
+    menuVoiceSub: "ऑडियो जल गुणवत्ता परामर्श प्रसारित करें",
+    menuRoiTitle: "इकाई लागत एवं समुदाय बचत (ROI)",
+    menuRoiSub: "शुद्धिकरण बनाम टैंकर आपूर्ति लागत"
   }
 };
 
@@ -234,6 +243,18 @@ function toggleLanguage() {
   document.getElementById('txtTrendSubtitle').innerText = t.trendSub;
   document.getElementById('txtTraceHeader').innerText = t.traceHeader;
   document.getElementById('txtDonutHeader').innerText = t.donutHeader;
+
+  const elMenuVoiceTitle = document.getElementById('txtMenuVoiceTitle');
+  if (elMenuVoiceTitle) elMenuVoiceTitle.innerText = t.menuVoiceTitle;
+
+  const elMenuVoiceSub = document.getElementById('txtMenuVoiceSub');
+  if (elMenuVoiceSub) elMenuVoiceSub.innerText = t.menuVoiceSub;
+
+  const elMenuRoiTitle = document.getElementById('txtMenuRoiTitle');
+  if (elMenuRoiTitle) elMenuRoiTitle.innerText = t.menuRoiTitle;
+
+  const elMenuRoiSub = document.getElementById('txtMenuRoiSub');
+  if (elMenuRoiSub) elMenuRoiSub.innerText = t.menuRoiSub;
 
   fetchLiveTelemetry();
 }
@@ -1017,6 +1038,29 @@ function playPanchayatVoiceAdvisory() {
 
   window.speechSynthesis.speak(utterance);
 }
+// -------------------------------------------------------------
+// Drawer Menu Triggers: ROI Modal & Voice Advisory
+// -------------------------------------------------------------
+function openRoiModal() {
+  const drawerEl = document.getElementById('appMenuOffcanvas');
+  if (drawerEl) {
+    const bsOffcanvas = bootstrap.Offcanvas.getInstance(drawerEl);
+    if (bsOffcanvas) bsOffcanvas.hide();
+  }
+  roiModal.show();
+}
 
+function triggerMenuVoiceAdvisory() {
+  const badge = document.getElementById('menuVoiceBadge');
+  if (badge) {
+    badge.innerText = "Broadcasting...";
+    badge.className = "badge bg-warning text-dark";
+    setTimeout(() => {
+      badge.innerText = "Broadcast";
+      badge.className = "badge bg-danger";
+    }, 3500);
+  }
+  playPanchayatVoiceAdvisory();
+}
 setInterval(fetchLiveTelemetry, 3000);
 fetchLiveTelemetry();
