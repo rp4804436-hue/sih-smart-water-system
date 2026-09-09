@@ -180,7 +180,8 @@
       </div>
     </div>
   </div>
-<!-- ================= SMART FEATURE CARDS (1 & 5) ================= -->
+
+  <!-- ================= SMART FEATURE CARDS (1 & 5) ================= -->
   <div class="row g-2 mb-3">
     <!-- Feature 1: Stoichiometric Lime Dispenser -->
     <div class="col-12 col-md-6">
@@ -190,7 +191,7 @@
           <span class="badge bg-primary">Ca(OH)₂</span>
         </div>
         <div class="d-flex align-items-baseline gap-2">
-          <h3 class="fw-bold mb-0 text-white" id="valLimeDosing">0.0</h3>
+          <h3 class="fw-bold mb-0 text-primary" id="valLimeDosing">0.0</h3>
           <span class="text-muted">g/m³ intake</span>
         </div>
         <small class="text-muted d-block mt-2" id="txtLimeStatus">Optimal buffer stoichiometry</small>
@@ -205,50 +206,24 @@
           <span class="badge bg-info text-dark">ML Surrogate</span>
         </div>
         <div class="row text-center mt-1">
-          <div class="col-6 border-end border-secondary">
+          <div class="col-6 border-end">
             <span class="d-block small text-muted">Est. Manganese (Mn)</span>
-            <h4 class="fw-bold mb-0 text-white" id="valProxyMn">0.00</h4>
-            <small class="text-muted">Limit: 0.10 mg/L</small>
+            <h4 class="fw-bold mb-0 text-primary" id="valProxyMn">0.00</h4>
+            <small class="text-muted" style="font-size: 0.68rem;">Limit: 0.10 mg/L</small>
           </div>
           <div class="col-6">
             <span class="d-block small text-muted">Est. Sulfate (SO₄²⁻)</span>
-            <h4 class="fw-bold mb-0 text-white" id="valProxySo4">0.0</h4>
-            <small class="text-muted">Limit: 200 mg/L</small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
- <!-- Predictive Filter Life Row (Full Width) -->
-  <div class="row g-2 mb-3">
-    <div class="col-12">
-      <div class="chart-card shadow-sm p-3 h-100 border-start border-4 border-primary">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h6 id="txtFilterHeader" class="fw-bold mb-0 text-primary" style="font-size: 0.85rem;">Predictive Filter & Consumable Life</h6>
-          <span class="badge bg-primary-subtle text-primary">Proactive</span>
-        </div>
-        <div class="mt-2">
-          <div class="d-flex justify-content-between mb-1">
-            <small id="txtFilterBed" class="fw-semibold text-truncate" style="font-size: 0.72rem;">Greensand & Activated Carbon Bed</small>
-            <small id="filterLifeText" class="text-muted fw-bold ps-1" style="font-size: 0.72rem;">78% Remaining</small>
-          </div>
-          <div class="progress mb-2" style="height: 6px;">
-            <div id="filterLifeBar" class="progress-bar bg-info" role="progressbar" style="width: 78%;"></div>
-          </div>
-          <div class="d-flex justify-content-between mb-1">
-            <small id="txtFilterUv" class="fw-semibold text-truncate" style="font-size: 0.72rem;">Inline UV-C Disinfection Lamp</small>
-            <small class="text-muted fw-bold ps-1" style="font-size: 0.72rem;">1,420 / 2,000 hrs</small>
-          </div>
-          <div class="progress" style="height: 6px;">
-            <div class="progress-bar bg-success" role="progressbar" style="width: 71%;"></div>
+            <h4 class="fw-bold mb-0 text-primary" id="valProxySo4">0.0</h4>
+            <small class="text-muted" style="font-size: 0.68rem;">Limit: 200 mg/L</small>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-    <!-- Predictive Filter Life Card -->
-    <div class="col-12 col-md-6">
+  <!-- Predictive Filter Life Row (Single Full-Width Card) -->
+  <div class="row g-2 mb-3">
+    <div class="col-12">
       <div class="chart-card shadow-sm p-3 h-100 border-start border-4 border-primary">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <h6 id="txtFilterHeader" class="fw-bold mb-0 text-primary" style="font-size: 0.85rem;">Predictive Filter & Consumable Life</h6>
@@ -379,7 +354,8 @@
         <span><span class="me-2">🌐</span>Language (भाषा)</span>
         <span id="langMenuBadge" class="badge bg-primary">English</span>
       </button>
-      <!-- +++ NEW: Panchayat IVRS Voice +++ -->
+
+      <!-- 2. Panchayat IVRS Voice Trigger -->
       <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2" onclick="triggerMenuVoiceAdvisory()">
         <div>
           <span><span class="me-2">📢</span><span id="txtMenuVoiceTitle">Panchayat IVRS Voice</span></span>
@@ -388,7 +364,7 @@
         <span class="badge bg-danger" id="menuVoiceBadge">Broadcast</span>
       </button>
 
-      <!-- +++ NEW: Unit Economics & ROI Modal Launcher +++ -->
+      <!-- 3. Unit Economics & ROI Modal Launcher -->
       <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2" data-bs-dismiss="offcanvas" onclick="openRoiModal()">
         <div>
           <span><span class="me-2">💰</span><span id="txtMenuRoiTitle">Unit Economics & ROI</span></span>
@@ -397,43 +373,43 @@
         <span class="badge bg-success" id="menuRoiBadge">88.3% Saved</span>
       </button>
 
-      <!-- 2. Operational Records Log -->
+      <!-- 4. Operational Records Log -->
       <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2" data-bs-dismiss="offcanvas" onclick="openRecordsModal()">
         <span><span class="me-2">📋</span>Operational Records Log</span>
         <span class="badge bg-dark">View Table</span>
       </button>
 
-      <!-- 3. Dark Mode Toggle -->
+      <!-- 5. Dark Mode Toggle -->
       <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2" onclick="toggleTheme()">
         <span><span class="me-2">🌙</span>Dark Mode</span>
         <span id="themeMenuLabel" class="badge bg-secondary">Off</span>
       </button>
 
-      <!-- 4. Export Audit PDF -->
+      <!-- 6. Export Audit PDF -->
       <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2" onclick="generateCompliancePDF()">
         <span><span class="me-2">📄</span>Export Audit PDF</span>
         <span class="badge bg-danger">IS 10500</span>
       </button>
 
-      <!-- 5. Export Historical CSV -->
+      <!-- 7. Export Historical CSV -->
       <a href="/api/download-csv?node_id=dhanbad_01" id="linkDownloadCsv" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2">
         <span><span class="me-2">📥</span>Download Raw CSV</span>
         <span class="badge bg-primary">Records</span>
       </a>
 
-      <!-- 6. GIS Cluster Map -->
+      <!-- 8. GIS Cluster Map -->
       <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2" data-bs-dismiss="offcanvas" onclick="openGisModal()">
         <span><span class="me-2">🗺️</span>GIS Mining Cluster Grid</span>
         <span class="badge bg-success">Map</span>
       </button>
 
-      <!-- 7. Sensor Diagnostics -->
+      <!-- 9. Sensor Diagnostics -->
       <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2" data-bs-dismiss="offcanvas" onclick="openDiagnosticsModal()">
         <span><span class="me-2">⚙️</span>Sensor Diagnostics</span>
         <span class="badge bg-info text-dark">Hardware</span>
       </button>
 
-      <!-- 8. Emergency WhatsApp Dispatcher -->
+      <!-- 10. Emergency WhatsApp Dispatcher -->
       <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-2" onclick="dispatchWhatsAppAlert()">
         <span><span class="me-2">📢</span>Alert Panchayat (WhatsApp)</span>
         <span class="badge bg-success">Broadcast</span>
@@ -446,6 +422,48 @@
 <!-- ============================================================== -->
 <!-- POPUP MODALS -->
 <!-- ============================================================== -->
+
+<!-- Unit Economics & ROI Modal -->
+<div class="modal fade" id="roiModal" tabindex="-1" aria-labelledby="roiModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow-lg">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold" id="roiModalLabel">💰 Unit Economics & Community ROI</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-3">
+        <p class="small text-muted mb-3">Audited financial comparison against standard tanker water procurement in mining zones (IS 10500 Compliant Supply).</p>
+        
+        <div class="row g-2 text-center mb-3">
+          <div class="col-4 p-2 rounded bg-light border">
+            <small class="text-muted d-block" style="font-size: 0.7rem;">Purification Cost</small>
+            <h5 class="fw-bold text-dark mb-0">₹0.14</h5>
+            <small class="text-muted" style="font-size: 0.65rem;">Per Liter</small>
+          </div>
+          <div class="col-4 p-2 rounded bg-light border">
+            <small class="text-muted d-block" style="font-size: 0.7rem;">Tanker Supply</small>
+            <h5 class="fw-bold text-muted mb-0">₹1.20</h5>
+            <small class="text-muted" style="font-size: 0.65rem;">Benchmark</small>
+          </div>
+          <div class="col-4 p-2 rounded bg-light border border-success">
+            <small class="text-success d-block fw-semibold" style="font-size: 0.7rem;">Net Savings</small>
+            <h5 class="fw-bold text-success mb-0">88.3%</h5>
+            <small class="text-success" style="font-size: 0.65rem;">₹1.06/L Saved</small>
+          </div>
+        </div>
+
+        <ul class="list-group list-group-flush small">
+          <li class="list-group-item bg-transparent px-0 text-muted">⚡ <strong>Power Consumption:</strong> 0.08 kWh/m³ (Solar hybrid compatible)</li>
+          <li class="list-group-item bg-transparent px-0 text-muted">🧪 <strong>Consumable Amortization:</strong> ₹0.04/L (Greensand, Lime & UV-C lamp life)</li>
+          <li class="list-group-item bg-transparent px-0 text-muted">👥 <strong>Community Impact:</strong> ₹38,160 estimated monthly savings per 1,000 residents</li>
+        </ul>
+      </div>
+      <div class="modal-footer border-top">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Operational Records Log Modal -->
 <div class="modal fade" id="recordsModal" tabindex="-1" aria-labelledby="recordsModalLabel" aria-hidden="true">
@@ -589,47 +607,7 @@
     </div>
   </div>
 </div>
-<!-- Unit Economics & ROI Modal -->
-<div class="modal fade" id="roiModal" tabindex="-1" aria-labelledby="roiModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content shadow-lg">
-      <div class="modal-header border-bottom">
-        <h5 class="modal-title fw-bold" id="roiModalLabel">💰 Unit Economics & Community ROI</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body p-3">
-        <p class="small text-muted mb-3">Audited financial comparison against standard tanker water procurement in mining zones (IS 10500 Compliant Supply).</p>
-        
-        <div class="row g-2 text-center mb-3">
-          <div class="col-4 p-2 rounded bg-light border">
-            <small class="text-muted d-block" style="font-size: 0.7rem;">Purification Cost</small>
-            <h5 class="fw-bold text-dark mb-0">₹0.14</h5>
-            <small class="text-muted" style="font-size: 0.65rem;">Per Liter</small>
-          </div>
-          <div class="col-4 p-2 rounded bg-light border">
-            <small class="text-muted d-block" style="font-size: 0.7rem;">Tanker Supply</small>
-            <h5 class="fw-bold text-muted mb-0">₹1.20</h5>
-            <small class="text-muted" style="font-size: 0.65rem;">Benchmark</small>
-          </div>
-          <div class="col-4 p-2 rounded bg-light border border-success">
-            <small class="text-success d-block fw-semibold" style="font-size: 0.7rem;">Net Savings</small>
-            <h5 class="fw-bold text-success mb-0">88.3%</h5>
-            <small class="text-success" style="font-size: 0.65rem;">₹1.06/L Saved</small>
-          </div>
-        </div>
 
-        <ul class="list-group list-group-flush small">
-          <li class="list-group-item bg-transparent px-0 text-muted">⚡ <strong>Power Consumption:</strong> 0.08 kWh/m³ (Solar hybrid compatible)</li>
-          <li class="list-group-item bg-transparent px-0 text-muted">🧪 <strong>Consumable Amortization:</strong> ₹0.04/L (Greensand, Lime & UV-C lamp life)</li>
-          <li class="list-group-item bg-transparent px-0 text-muted">👥 <strong>Community Impact:</strong> ₹38,160 estimated monthly savings per 1,000 residents</li>
-        </ul>
-      </div>
-      <div class="modal-footer border-top">
-        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/app.js"></script>
 
