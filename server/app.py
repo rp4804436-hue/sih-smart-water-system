@@ -3,6 +3,7 @@ import csv
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
+
 # ============================================================
 # SMART FEATURES: STOICHIOMETRIC DOSING, DIAGNOSTICS & PROXIES
 # ============================================================
@@ -41,7 +42,16 @@ def compute_proxy_contaminants(tds, ph, iron):
         "sulfate_safe": est_so4 <= 200.0
     }
 
-# Resolve paths dynamically whether executing locally or inside Render containers
+def compute_wqi(fe, ph, turb, tds):
+    q_fe = max(0, 100 - (fe / 0.3) * 100) if fe <= 0.3 else max(0, 50 - ((fe - 0.3) / 1.0) * 50)
+    q_ph = max(0, 100 - (abs(ph - 7.0) / 1.5) * 100)
+    q_turb = max(0, 100 - (turb / 5.0) * 100) if turb <= 5.0 else max(0, 50 - ((turb - 5.0) / 15.0) * 50)
+    q_tds = max(0, 100 - (tds / 500.0) * 100) if tds <= 500 else max(0, 50 - ((tds - 500) / 500.0) * 50)
+    return round((q_fe * 0.35) + (q_ph * 0.25) + (q_turb * 0.20) + (q_tds * 0.20))
+
+# ============================================================
+# APP CONFIGURATION & STORAGE PATHS
+# ============================================================
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 DASHBOARD_DIR = os.path.join(BASE_DIR, 'dashboard')
 DATA_DIR = os.path.dirname(__file__)
@@ -51,17 +61,18 @@ CORS(app)
 
 NODE_FILES = {
     'dhanbad_01': os.path.join(DATA_DIR, 'telemetry_dhanbad_01.csv'),
-    'bokaro_02': os.path.join(DATA_DIR, 'telemetry_bokaro_02.csv'),
+    'bokaro_02':  os.path.join(DATA_DIR, 'telemetry_bokaro_02.csv'),
     'ramgarh_03': os.path.join(DATA_DIR, 'telemetry_ramgarh_03.csv'),
-    'ranchi_04': os.path.join(DATA_DIR, 'telemetry_ranchi_04.csv')
+    'ranchi_04':  os.path.join(DATA_DIR, 'telemetry_ranchi_04.csv')
 }
 
-CSV_FIELDNAMES = ['Timestamp', 'Node_ID', 'Iron_mgL', 'pH', 'Turbidity_NTU', 'TDS_PPM', 'Temperature_C', 'WQI', 'Status', 'Mode']
+CSV_FIELDNAMES = [
+    'Timestamp', 'Node_ID', 'Iron_mgL', 'pH', 'Turbidity_NTU',
+    'TDS_PPM', 'Temperature_C', 'WQI', 'Status', 'Mode'
+]
 
-# 20 Realistic Telemetry Progression Samples per Mining Station Profile
 SEED_PROFILES_20 = {
     'dhanbad_01': [
-        # Heavy Acid Mine Drainage & Suspended Slurry Breakthrough -> Gradual Sedimentation
         {'iron': 7.60, 'ph': 4.10, 'turbidity': 44.0, 'tds': 790, 'temp': 28.2, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
         {'iron': 7.45, 'ph': 4.15, 'turbidity': 43.5, 'tds': 780, 'temp': 28.2, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
         {'iron': 7.20, 'ph': 4.25, 'turbidity': 42.0, 'tds': 770, 'temp': 28.1, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
@@ -84,7 +95,6 @@ SEED_PROFILES_20 = {
         {'iron': 4.70, 'ph': 5.50, 'turbidity': 25.0, 'tds': 600, 'temp': 27.2, 'status': 'Unsafe', 'mode': 'Heavy Purification'}
     ],
     'bokaro_02': [
-        # Moderate Acidity transitioning through alkaline dosing -> Irrigation Grade
         {'iron': 3.40, 'ph': 5.40, 'turbidity': 18.0, 'tds': 540, 'temp': 27.4, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
         {'iron': 3.25, 'ph': 5.50, 'turbidity': 17.2, 'tds': 530, 'temp': 27.3, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
         {'iron': 3.10, 'ph': 5.55, 'turbidity': 16.5, 'tds': 515, 'temp': 27.3, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
@@ -107,7 +117,6 @@ SEED_PROFILES_20 = {
         {'iron': 1.00, 'ph': 6.72, 'turbidity': 5.5,  'tds': 330, 'temp': 26.4, 'status': 'Unsafe', 'mode': 'Low Purification'}
     ],
     'ramgarh_03': [
-        # Severe Pit Tailings AMD (Hyper-acidic pH < 4.0, Extreme Heavy Metal Loading)
         {'iron': 9.80, 'ph': 3.30, 'turbidity': 58.0, 'tds': 940, 'temp': 29.1, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
         {'iron': 9.60, 'ph': 3.35, 'turbidity': 56.5, 'tds': 920, 'temp': 29.0, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
         {'iron': 9.40, 'ph': 3.42, 'turbidity': 55.0, 'tds': 905, 'temp': 28.9, 'status': 'Unsafe', 'mode': 'Heavy Purification'},
@@ -130,7 +139,6 @@ SEED_PROFILES_20 = {
         {'iron': 6.80, 'ph': 4.45, 'turbidity': 35.0, 'tds': 725, 'temp': 27.8, 'status': 'Unsafe', 'mode': 'Heavy Purification'}
     ],
     'ranchi_04': [
-        # IS 10500 Potable Baseline (Post-Greensand & UV Polish Safe Tap)
         {'iron': 0.28, 'ph': 7.12, 'turbidity': 3.8, 'tds': 210, 'temp': 26.2, 'status': 'Safe', 'mode': 'Low Purification'},
         {'iron': 0.25, 'ph': 7.16, 'turbidity': 3.4, 'tds': 205, 'temp': 26.1, 'status': 'Safe', 'mode': 'Low Purification'},
         {'iron': 0.22, 'ph': 7.20, 'turbidity': 3.1, 'tds': 198, 'temp': 26.1, 'status': 'Safe', 'mode': 'Low Purification'},
@@ -154,14 +162,6 @@ SEED_PROFILES_20 = {
     ]
 }
 
-def compute_wqi(fe, ph, turb, tds):
-    q_fe = max(0, 100 - (fe / 0.3) * 100) if fe <= 0.3 else max(0, 50 - ((fe - 0.3) / 1.0) * 50)
-    q_ph = max(0, 100 - (abs(ph - 7.0) / 1.5) * 100)
-    q_turb = max(0, 100 - (turb / 5.0) * 100) if turb <= 5.0 else max(0, 50 - ((turb - 5.0) / 15.0) * 50)
-    q_tds = max(0, 100 - (tds / 500.0) * 100) if tds <= 500 else max(0, 50 - ((tds - 500) / 500.0) * 50)
-    return round((q_fe * 0.35) + (q_ph * 0.25) + (q_turb * 0.20) + (q_tds * 0.20))
-
-# Pre-populate CSV logs with 20 chronologically staggered entries per node if missing
 now = datetime.now()
 for node_id, file_path in NODE_FILES.items():
     if not os.path.exists(file_path):
@@ -170,7 +170,6 @@ for node_id, file_path in NODE_FILES.items():
             writer.writeheader()
             samples = SEED_PROFILES_20[node_id]
             for idx, sample in enumerate(samples):
-                # Stagger records backward (oldest first: 60 mins ago -> newest: now)
                 timestamp = (now - timedelta(minutes=(len(samples) - 1 - idx) * 3)).strftime('%Y-%m-%d %H:%M:%S')
                 wqi = compute_wqi(sample['iron'], sample['ph'], sample['turbidity'], sample['tds'])
                 writer.writerow({
@@ -192,7 +191,9 @@ def resolve_node(req):
         node_id = 'dhanbad_01'
     return NODE_FILES[node_id], node_id
 
-# Serve PWA Frontend Assets
+# ============================================================
+# ROUTES & ENDPOINTS
+# ============================================================
 @app.route('/')
 def index():
     return send_from_directory(DASHBOARD_DIR, 'index.html')
@@ -201,7 +202,7 @@ def index():
 def static_files(filename):
     return send_from_directory(DASHBOARD_DIR, filename)
 
-# Ingest Live Telemetry (ESP32 or REST tests)
+# Ingest Live Telemetry & Return Real-Time Actuation Commands to ESP32
 @app.route('/api/telemetry', methods=['POST'])
 def receive_telemetry():
     data = request.get_json() or {}
@@ -215,10 +216,24 @@ def receive_telemetry():
     turb = float(data.get('turbidity', 0.0))
     tds = float(data.get('tds', 0.0))
     temp = float(data.get('temperature', 25.0))
-    status = data.get('status', 'Unsafe')
-    mode = data.get('mode', 'Low Purification')
+
+    # 1. Contamination, Status & Remediation Mode
+    is_contaminated = (ph < 6.5 or ph > 8.5 or fe > 0.30 or turb > 5.0)
+    status = 'Unsafe' if is_contaminated else 'Safe'
+    mode = 'Heavy Purification' if is_contaminated else 'Low Purification'
     wqi = compute_wqi(fe, ph, turb, tds)
 
+    # 2. Smart Analytics: Stoichiometric Dosing & Diagnostics
+    lime_dosing = compute_stoichiometric_lime(ph, fe)
+    diagnostics = run_sensor_diagnostics(ph, fe, turb, tds, temp)
+
+    # 3. 8-Bit PWM Dosing Motor Speed (0 to 255)
+    pump_pwm = 0
+    if lime_dosing > 0.0:
+        clamped_dose = max(1.0, min(lime_dosing, 60.0))
+        pump_pwm = int(90 + ((clamped_dose - 1.0) / 59.0) * (255 - 90))
+
+    # 4. Append to CSV
     row = {
         'Timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'Node_ID': node_id,
@@ -236,9 +251,18 @@ def receive_telemetry():
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES)
         writer.writerow(row)
 
-    return jsonify({"success": True, "node_id": node_id, "wqi": wqi}), 201
+    # 5. Return JSON Downlink Packet to ESP32
+    return jsonify({
+        "status": "success",
+        "node_id": node_id,
+        "wqi": wqi,
+        "mode": mode,
+        "lime_dosing_g_m3": lime_dosing,
+        "pump_pwm": pump_pwm,
+        "uv_state": 1 if is_contaminated else 0,
+        "diagnostics": diagnostics
+    }), 200
 
-# Fetch Latest Ingested Record for Specified Station
 @app.route('/api/latest', methods=['GET'])
 def get_latest():
     file_path, node_id = resolve_node(request)
@@ -249,7 +273,7 @@ def get_latest():
         rows = list(csv.DictReader(f))
         if not rows:
             return jsonify({"empty": True, "node_id": node_id})
-        
+
         last = rows[-1]
         fe_val = float(last['Iron_mgL'])
         ph_val = float(last['pH'])
@@ -275,7 +299,6 @@ def get_latest():
         }
         return jsonify(latest)
 
-# Retrieve Historical Log Sequence for Trend Analysis
 @app.route('/api/history', methods=['GET'])
 def get_history():
     file_path, node_id = resolve_node(request)
@@ -286,7 +309,6 @@ def get_history():
         rows = list(csv.DictReader(f))
         return jsonify(rows)
 
-# Download CSV Register for Active Node
 @app.route('/api/download-csv', methods=['GET'])
 def download_csv():
     file_path, node_id = resolve_node(request)
