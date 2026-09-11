@@ -109,7 +109,7 @@ function toggleTheme() {
   const isDark = document.body.classList.contains('dark-mode');
   const label = document.getElementById('themeMenuLabel');
   if (label) {
-    label.innerText = isDark ? 'On' : 'Off';
+    label.innerText = isDark ? (currentLanguage === 'HI' ? 'चालू' : 'On') : (currentLanguage === 'HI' ? 'बंद' : 'Off');
     label.className = isDark ? 'badge bg-success' : 'badge bg-secondary';
   }
 
@@ -135,7 +135,7 @@ function toggleTheme() {
 
 function dispatchWhatsAppAlert() {
   if (!rawTelemetryHistory || rawTelemetryHistory.length === 0) {
-    alert("No live telemetry to dispatch.");
+    alert(currentLanguage === 'HI' ? "प्रसारित करने के लिए कोई लाइव डेटा उपलब्ध नहीं है।" : "No live telemetry to dispatch.");
     return;
   }
   const latest = rawTelemetryHistory[rawTelemetryHistory.length - 1];
@@ -156,48 +156,161 @@ function dispatchWhatsAppAlert() {
 }
 
 // -------------------------------------------------------------
-// 2. Localization
+// 2. Comprehensive Localization Dictionary
 // -------------------------------------------------------------
 const i18n = {
   EN: {
     headerSub: "SIH 26040 | Mining & Rural Telemetry Edge Node",
     schematicHeader: "Closed-Loop Hydraulic Remediation Stream",
-    node1: "Mining Pit", node2: "Greensand", node2Sub: "Fe Stripping", node3: "Sensing", node4: "UV-C Polish",
-    pipeInlet: "Inlet Acidic Run-Off", pipeMid: "Neutralization & Filtration", pipeOutlet: "Treated Clean Output",
-    wqiTitle: "Water Quality Index", hpiTitle: "Heavy Metal Pollution Index",
-    iron: "Dissolved Fe", ph: "pH Level", turb: "Turbidity", tds: "TDS Level", temp: "Temperature", active: "Active",
+    node1: "Mining Pit",
+    node2: "Greensand",
+    node2Sub: "Fe Stripping",
+    node3: "Sensing",
+    node4: "UV-C Polish",
+    pipeInlet: "Inlet Acidic Run-Off",
+    pipeMid: "Neutralization & Filtration",
+    pipeOutlet: "Treated Clean Output",
+    wqiTitle: "Water Quality Index",
+    hpiTitle: "Heavy Metal Pollution Index",
+    iron: "Dissolved Fe",
+    ph: "pH Level",
+    turb: "Turbidity",
+    tds: "TDS Level",
+    temp: "Temperature",
+    active: "Active",
+    limeCardTitle: "AMD Neutralization (Lime Dosing)",
+    limeUnit: "g/m³ intake",
+    proxyTitle: "Surrogate Metal Proxies (IS 10500)",
+    proxyBadge: "ML Surrogate",
+    proxyMnLabel: "Est. Manganese (Mn)",
+    proxyMnLimit: "Limit: 0.10 mg/L",
+    proxySo4Label: "Est. Sulfate (SO₄²⁻)",
+    proxySo4Limit: "Limit: 200 mg/L",
+    filterHeader: "Predictive Filter & Consumable Life",
+    filterBed: "Greensand & Activated Carbon Bed",
+    filterUv: "Inline UV-C Disinfection Lamp",
     healthHeader: "Predictive Health Risk & Pathogen Warning",
-    toxicRiskTitle: "Heavy Metal Toxicosis", pathogenRiskTitle: "Gastrointestinal Outbreak",
-    roiHeader: "Unit Economics & Community ROI", costPerLitre: "Purification Cost", tankerBenchmark: "Tanker Supply", netSavings: "Net Savings",
-    filterHeader: "Predictive Filter & Consumable Life", filterBed: "Greensand & Activated Carbon Bed", filterUv: "Inline UV-C Disinfection Lamp",
-    trendHeader: "Water Quality Index (WQI) vs Time", trendSub: "Longitudinal trend derived via IS 10500 weighted sub-indices",
-    traceHeader: "Live Parameter Traces vs Thresholds", donutHeader: "Water Usability Ratio",
-    drinkable: "Drinkable / Household", agriculture: "Agriculture Purpose", unusable: "Unusable / Undrinkable",
+    toxicRiskTitle: "Heavy Metal Toxicosis",
+    pathogenRiskTitle: "Gastrointestinal Outbreak",
+    roiHeader: "Unit Economics & Community ROI",
+    costPerLitre: "Purification Cost",
+    tankerBenchmark: "Tanker Supply",
+    netSavings: "Net Savings",
+    trendHeader: "Water Quality Index (WQI) vs Time",
+    trendSub: "Longitudinal trend derived via IS 10500 weighted sub-indices",
+    traceHeader: "Live Parameter Traces vs Thresholds",
+    donutHeader: "Water Usability Ratio",
+    drinkable: "Drinkable / Household",
+    agriculture: "Agriculture Purpose",
+    unusable: "Unusable / Undrinkable",
+    menuClusterTitle: "Active Cluster Node",
+    menuOpsHeader: "Operations & Preferences",
+    menuLangTitle: "Language (भाषा)",
     menuVoiceTitle: "Panchayat IVRS Voice",
     menuVoiceSub: "Broadcast audio water advisory",
+    menuVoiceBadge: "Broadcast",
     menuRoiTitle: "Unit Economics & ROI",
-    menuRoiSub: "Treatment vs tanker cost metrics"
+    menuRoiSub: "Treatment vs tanker cost metrics",
+    menuRecords: "Operational Records Log",
+    menuViewTable: "View Table",
+    menuDarkMode: "Dark Mode",
+    menuPdf: "Export Audit PDF",
+    menuCsv: "Download Raw CSV",
+    menuCsvBadge: "Records",
+    menuGis: "GIS Mining Cluster Grid",
+    menuGisBadge: "Map",
+    menuDiag: "Sensor Diagnostics",
+    menuDiagBadge: "Hardware",
+    menuWa: "Alert Panchayat (WhatsApp)",
+    menuWaBadge: "Broadcast",
+    modalIngestedLabel: "Live Ingested Value",
+    modalStandardLabel: "Standard Threshold",
+    modalWaveform: "High-Resolution Temporal Waveform",
+    modalCloseBtn: "Close",
+    optNode0: "Node-01: Dhanbad Washery",
+    optNode1: "Node-02: Bokaro Pit Drain",
+    optNode2: "Node-03: Ramgarh Tailings Pond",
+    optNode3: "Node-04: Ranchi Rural Borewell"
   },
   HI: {
     headerSub: "एसआईएच 26040 | खनन एवं ग्रामीण जल टेलीमेट्री एज नोड",
     schematicHeader: "स्वचालित जल शुद्धिकरण एवं प्रवाह प्रणाली",
-    node1: "खनन गड्ढा", node2: "ग्रीनसैंड", node2Sub: "आयरन निष्कासन", node3: "सेंसर कक्ष", node4: "यूवी-सी शोधन",
-    pipeInlet: "अम्लीय अपशिष्ट जल प्रवेश", pipeMid: "उदासीनीकरण एवं निस्यंदन", pipeOutlet: "शुद्ध सुरक्षित जल निकासी",
-    wqiTitle: "जल गुणवत्ता सूचकांक (WQI)", hpiTitle: "भारी धातु प्रदूषण सूचकांक (HPI)",
-    iron: "घुलित लोहा (Fe)", ph: "पीएच स्तर (pH)", turb: "गंदलापन (Turbidity)", tds: "टीडीएस स्तर (TDS)", temp: "तापमान", active: "सक्रिय",
+    node1: "खनन गड्ढा",
+    node2: "ग्रीनसैंड",
+    node2Sub: "आयरन निष्कासन",
+    node3: "सेंसर कक्ष",
+    node4: "यूवी-सी शोधन",
+    pipeInlet: "अम्लीय अपशिष्ट जल प्रवेश",
+    pipeMid: "उदासीनीकरण एवं निस्यंदन",
+    pipeOutlet: "शुद्ध सुरक्षित जल निकासी",
+    wqiTitle: "जल गुणवत्ता सूचकांक (WQI)",
+    hpiTitle: "भारी धातु प्रदूषण सूचकांक (HPI)",
+    iron: "घुलित लोहा (Fe)",
+    ph: "पीएच स्तर (pH)",
+    turb: "गंदलापन (Turbidity)",
+    tds: "टीडीएस स्तर (TDS)",
+    temp: "तापमान",
+    active: "सक्रिय",
+    limeCardTitle: "अम्लीय जल उदासीनीकरण (चूना खुराक)",
+    limeUnit: "ग्राम/मी³ प्रवाह",
+    proxyTitle: "सरोगेट भारी धातु अनुमान (IS 10500)",
+    proxyBadge: "एमएल मॉडल",
+    proxyMnLabel: "अनुमानित मैंगनीज (Mn)",
+    proxyMnLimit: "सीमा: 0.10 मिग्रा/ली",
+    proxySo4Label: "अनुमानित सल्फेट (SO₄²⁻)",
+    proxySo4Limit: "सीमा: 200 मिग्रा/ली",
+    filterHeader: "फ़िल्टर आयु एवं पूर्वानुमान",
+    filterBed: "ग्रीनसैंड व चारकोल बेड",
+    filterUv: "यूवी-सी कीटाणुशोधन लैंप",
     healthHeader: "संभावित स्वास्थ्य जोखिम एवं महामारी चेतावनी",
-    toxicRiskTitle: "भारी धातु विषाक्तता जोखिम", pathogenRiskTitle: "उदर/संक्रमण रोग जोखिम",
-    roiHeader: "इकाई लागत एवं समुदाय बचत (ROI)", costPerLitre: "शुद्धिकरण लागत", tankerBenchmark: "टैंकर जल मानक", netSavings: "कुल शुद्ध बचत",
-    filterHeader: "फ़िल्टर आयु एवं पूर्वानुमान", filterBed: "ग्रीनसैंड व चारकोल बेड", filterUv: "यूवी-सी कीटाणुशोधन लैंप",
-    trendHeader: "जल गुणवत्ता सूचकांक (समय अनुसार)", trendSub: "IS 10500 मानकों पर आधारित प्रवृत्तियां",
-    traceHeader: "लाइव मापदंड एवं सीमा तुलना", donutHeader: "जल उपयोगिता अनुपात",
-    drinkable: "पीने योग्य / घरेलू उपयोग", agriculture: "कृषि सिंचाई हेतु", unusable: "दूषित / अनुपयोगी",
+    toxicRiskTitle: "भारी धातु विषाक्तता जोखिम",
+    pathogenRiskTitle: "उदर/संक्रमण रोग जोखिम",
+    roiHeader: "इकाई लागत एवं समुदाय बचत (ROI)",
+    costPerLitre: "शुद्धिकरण लागत",
+    tankerBenchmark: "टैंकर जल मानक",
+    netSavings: "कुल शुद्ध बचत",
+    trendHeader: "जल गुणवत्ता सूचकांक (समय अनुसार)",
+    trendSub: "IS 10500 मानकों पर आधारित प्रवृत्तियां",
+    traceHeader: "लाइव मापदंड एवं सीमा तुलना",
+    donutHeader: "जल उपयोगिता अनुपात",
+    drinkable: "पीने योग्य / घरेलू उपयोग",
+    agriculture: "कृषि सिंचाई हेतु",
+    unusable: "दूषित / अनुपयोगी",
+    menuClusterTitle: "सक्रिय क्लस्टर नोड",
+    menuOpsHeader: "संचालन एवं प्राथमिकताएं",
+    menuLangTitle: "भाषा (Language)",
     menuVoiceTitle: "पंचायत IVRS ध्वनि संदेश",
     menuVoiceSub: "ऑडियो जल गुणवत्ता परामर्श प्रसारित करें",
+    menuVoiceBadge: "प्रसारित करें",
     menuRoiTitle: "इकाई लागत एवं समुदाय बचत (ROI)",
-    menuRoiSub: "शुद्धिकरण बनाम टैंकर आपूर्ति लागत"
+    menuRoiSub: "शुद्धिकरण बनाम टैंकर आपूर्ति लागत",
+    menuRecords: "परिचालन रिकॉर्ड लॉग",
+    menuViewTable: "तालिका देखें",
+    menuDarkMode: "डार्क मोड",
+    menuPdf: "ऑडिट PDF डाउनलोड",
+    menuCsv: "रॉ CSV डाउनलोड करें",
+    menuCsvBadge: "रिकॉर्ड्स",
+    menuGis: "GIS खनन क्लस्टर ग्रिड",
+    menuGisBadge: "मानचित्र",
+    menuDiag: "सेंसर निदान एवं स्थिति",
+    menuDiagBadge: "हार्डवेयर",
+    menuWa: "पंचायत को सूचित करें (WhatsApp)",
+    menuWaBadge: "अलर्ट भेजें",
+    modalIngestedLabel: "लाइव मापा गया मान",
+    modalStandardLabel: "मानक सुरक्षा सीमा",
+    modalWaveform: "उच्च-रिज़ॉल्यूशन समय तरंग (Waveform)",
+    modalCloseBtn: "बंद करें",
+    optNode0: "नोड-01: धनबाद वाशरी",
+    optNode1: "नोड-02: बोकारो पिट ड्रेन",
+    optNode2: "नोड-03: रामगढ़ टेलिंग्स पौंड",
+    optNode3: "नोड-04: रांची ग्रामीण बोरवेल"
   }
 };
+
+function setSafeText(elemId, textValue) {
+  const el = document.getElementById(elemId);
+  if (el) el.innerText = textValue;
+}
 
 function toggleLanguage() {
   currentLanguage = currentLanguage === 'EN' ? 'HI' : 'EN';
@@ -209,56 +322,92 @@ function toggleLanguage() {
     menuBadge.className = currentLanguage === 'EN' ? 'badge bg-primary' : 'badge bg-warning text-dark';
   }
 
-  document.getElementById('txtHeaderSubtitle').innerText = t.headerSub;
-  document.getElementById('txtSchematicHeader').innerText = t.schematicHeader;
-  document.getElementById('txtNode1').innerText = t.node1;
-  document.getElementById('txtNode2').innerText = t.node2;
-  document.getElementById('txtNode2Sub').innerText = t.node2Sub;
-  document.getElementById('txtNode3').innerText = t.node3;
-  document.getElementById('txtNode4').innerText = t.node4;
-  document.getElementById('txtPipeInlet').innerText = t.pipeInlet;
-  document.getElementById('txtPipeMid').innerText = t.pipeMid;
-  document.getElementById('txtPipeOutlet').innerText = t.pipeOutlet;
+  // Header & Pipe Flow
+  setSafeText('txtHeaderSubtitle', t.headerSub);
+  setSafeText('txtSchematicHeader', t.schematicHeader);
+  setSafeText('txtNode1', t.node1);
+  setSafeText('txtNode2', t.node2);
+  setSafeText('txtNode2Sub', t.node2Sub);
+  setSafeText('txtNode3', t.node3);
+  setSafeText('txtNode4', t.node4);
+  setSafeText('txtPipeInlet', t.pipeInlet);
+  setSafeText('txtPipeMid', t.pipeMid);
+  setSafeText('txtPipeOutlet', t.pipeOutlet);
 
-  document.getElementById('cardCompositeTitle').innerText = isHpiMode ? t.hpiTitle : t.wqiTitle;
-  document.getElementById('txtCardIron').innerText = t.iron;
-  document.getElementById('txtCardPh').innerText = t.ph;
-  document.getElementById('txtCardTurb').innerText = t.turb;
-  document.getElementById('txtCardTds').innerText = t.tds;
-  document.getElementById('txtCardTemp').innerText = t.temp;
-  document.getElementById('txtCardTempActive').innerText = t.active;
+  // Cards
+  setSafeText('cardCompositeTitle', isHpiMode ? t.hpiTitle : t.wqiTitle);
+  setSafeText('txtCardIron', t.iron);
+  setSafeText('txtCardPh', t.ph);
+  setSafeText('txtCardTurb', t.turb);
+  setSafeText('txtCardTds', t.tds);
+  setSafeText('txtCardTemp', t.temp);
+  setSafeText('txtCardTempActive', t.active);
 
- const elRoiHeader = document.getElementById('txtRoiHeader');
-  if (elRoiHeader) elRoiHeader.innerText = t.roiHeader;
-  const elCostPerLitre = document.getElementById('txtCostPerLitre');
-  if (elCostPerLitre) elCostPerLitre.innerText = t.costPerLitre;
-  const elTankerBenchmark = document.getElementById('txtTankerBenchmark');
-  if (elTankerBenchmark) elTankerBenchmark.innerText = t.tankerBenchmark;
-  const elNetSavings = document.getElementById('txtNetSavings');
-  if (elNetSavings) elNetSavings.innerText = t.netSavings;
-  document.getElementById('txtFilterHeader').innerText = t.filterHeader;
-  document.getElementById('txtFilterBed').innerText = t.filterBed;
-  document.getElementById('txtFilterUv').innerText = t.filterUv;
+  // Smart Feature Cards
+  setSafeText('txtLimeCardTitle', t.limeCardTitle);
+  setSafeText('txtLimeUnit', t.limeUnit);
+  setSafeText('txtProxyTitle', t.proxyTitle);
+  setSafeText('txtProxyBadge', t.proxyBadge);
+  setSafeText('txtProxyMnLabel', t.proxyMnLabel);
+  setSafeText('txtProxyMnLimit', t.proxyMnLimit);
+  setSafeText('txtProxySo4Label', t.proxySo4Label);
+  setSafeText('txtProxySo4Limit', t.proxySo4Limit);
 
-  document.getElementById('txtHealthHeader').innerText = t.healthHeader;
-  document.getElementById('txtToxicRiskTitle').innerText = t.toxicRiskTitle;
-  document.getElementById('txtPathogenRiskTitle').innerText = t.pathogenRiskTitle;
-  document.getElementById('txtTrendHeader').innerText = t.trendHeader;
-  document.getElementById('txtTrendSubtitle').innerText = t.trendSub;
-  document.getElementById('txtTraceHeader').innerText = t.traceHeader;
-  document.getElementById('txtDonutHeader').innerText = t.donutHeader;
+  // ROI, Filter & Risk Modules
+  setSafeText('txtRoiHeader', t.roiHeader);
+  setSafeText('txtCostPerLitre', t.costPerLitre);
+  setSafeText('txtTankerBenchmark', t.tankerBenchmark);
+  setSafeText('txtNetSavings', t.netSavings);
+  setSafeText('txtFilterHeader', t.filterHeader);
+  setSafeText('txtFilterBed', t.filterBed);
+  setSafeText('txtFilterUv', t.filterUv);
+  setSafeText('txtHealthHeader', t.healthHeader);
+  setSafeText('txtToxicRiskTitle', t.toxicRiskTitle);
+  setSafeText('txtPathogenRiskTitle', t.pathogenRiskTitle);
 
-  const elMenuVoiceTitle = document.getElementById('txtMenuVoiceTitle');
-  if (elMenuVoiceTitle) elMenuVoiceTitle.innerText = t.menuVoiceTitle;
+  // Analytics Titles
+  setSafeText('txtTrendHeader', t.trendHeader);
+  setSafeText('txtTrendSubtitle', t.trendSub);
+  setSafeText('txtTraceHeader', t.traceHeader);
+  setSafeText('txtDonutHeader', t.donutHeader);
 
-  const elMenuVoiceSub = document.getElementById('txtMenuVoiceSub');
-  if (elMenuVoiceSub) elMenuVoiceSub.innerText = t.menuVoiceSub;
+  // Offcanvas Menu Drawer Elements
+  setSafeText('txtMenuClusterTitle', t.menuClusterTitle);
+  setSafeText('txtMenuOpsHeader', t.menuOpsHeader);
+  setSafeText('txtMenuLangTitle', t.menuLangTitle);
+  setSafeText('txtMenuVoiceTitle', t.menuVoiceTitle);
+  setSafeText('txtMenuVoiceSub', t.menuVoiceSub);
+  setSafeText('menuVoiceBadge', t.menuVoiceBadge);
+  setSafeText('txtMenuRoiTitle', t.menuRoiTitle);
+  setSafeText('txtMenuRoiSub', t.menuRoiSub);
+  setSafeText('txtMenuRecords', t.menuRecords);
+  setSafeText('txtMenuViewTable', t.menuViewTable);
+  setSafeText('txtMenuDarkMode', t.menuDarkMode);
+  setSafeText('txtMenuPdf', t.menuPdf);
+  setSafeText('txtMenuCsv', t.menuCsv);
+  setSafeText('txtMenuCsvBadge', t.menuCsvBadge);
+  setSafeText('txtMenuGis', t.menuGis);
+  setSafeText('txtMenuGisBadge', t.menuGisBadge);
+  setSafeText('txtMenuDiag', t.menuDiag);
+  setSafeText('txtMenuDiagBadge', t.menuDiagBadge);
+  setSafeText('txtMenuWa', t.menuWa);
+  setSafeText('txtMenuWaBadge', t.menuWaBadge);
 
-  const elMenuRoiTitle = document.getElementById('txtMenuRoiTitle');
-  if (elMenuRoiTitle) elMenuRoiTitle.innerText = t.menuRoiTitle;
+  // Dropdown Options
+  setSafeText('optNode0', t.optNode0);
+  setSafeText('optNode1', t.optNode1);
+  setSafeText('optNode2', t.optNode2);
+  setSafeText('optNode3', t.optNode3);
 
-  const elMenuRoiSub = document.getElementById('txtMenuRoiSub');
-  if (elMenuRoiSub) elMenuRoiSub.innerText = t.menuRoiSub;
+  // Modal Text
+  setSafeText('txtModalIngestedLabel', t.modalIngestedLabel);
+  setSafeText('txtModalStandardLabel', t.modalStandardLabel);
+  setSafeText('txtModalWaveform', t.modalWaveform);
+  setSafeText('txtModalCloseBtn', t.modalCloseBtn);
+
+  // Chart Labels
+  statusPieChart.data.labels = [t.drinkable, t.agriculture, t.unusable];
+  statusPieChart.update();
 
   fetchLiveTelemetry();
 }
@@ -272,15 +421,15 @@ function toggleHpiMode() {
   const badge = document.getElementById('hpiToggleBadge');
 
   if (isHpiMode) {
-    title.innerText = t.hpiTitle;
-    unit.innerText = " HPI";
-    benchmark.innerText = "≤ 100 Permissible";
-    badge.innerText = "Switch to WQI";
+    if (title) title.innerText = t.hpiTitle;
+    if (unit) unit.innerText = " HPI";
+    if (benchmark) benchmark.innerText = "≤ 100 Permissible";
+    if (badge) badge.innerText = currentLanguage === 'HI' ? "WQI पर स्विच करें" : "Switch to WQI";
   } else {
-    title.innerText = t.wqiTitle;
-    unit.innerText = "/100";
-    benchmark.innerText = "≥ 70 Safe";
-    badge.innerText = "Switch to HPI";
+    if (title) title.innerText = t.wqiTitle;
+    if (unit) unit.innerText = "/100";
+    if (benchmark) benchmark.innerText = "≥ 70 Safe";
+    if (badge) badge.innerText = currentLanguage === 'HI' ? "HPI पर स्विच करें" : "Switch to HPI";
   }
   fetchLiveTelemetry();
 }
@@ -433,7 +582,8 @@ function handleSliceZoom(sliceIndex) {
   if (selectedPieSlice === sliceIndex) {
     dataset.offset = [0, 0, 0];
     selectedPieSlice = null;
-    document.getElementById('pieFocusBanner').classList.add('d-none');
+    const banner = document.getElementById('pieFocusBanner');
+    if (banner) banner.classList.add('d-none');
   } else {
     selectedPieSlice = sliceIndex;
     dataset.offset = [0, 0, 0];
@@ -450,20 +600,23 @@ function handleSliceZoom(sliceIndex) {
     if (sliceIndex === 1) color = '#f59e0b';
     if (sliceIndex === 2) color = '#ef4444';
 
-    banner.className = `alert alert-light border text-center py-1 px-2 mb-2 shadow-sm`;
-    banner.style.borderLeft = `5px solid ${color}`;
-    bannerText.innerHTML = `<span style="color: ${color}; font-weight: bold;">${label}</span>: <strong>${val} logs</strong> (${pct}% of total run)`;
-    banner.classList.remove('d-none');
+    if (banner && bannerText) {
+      banner.className = `alert alert-light border text-center py-1 px-2 mb-2 shadow-sm`;
+      banner.style.borderLeft = `5px solid ${color}`;
+      bannerText.innerHTML = `<span style="color: ${color}; font-weight: bold;">${label}</span>: <strong>${val} ${currentLanguage === 'HI' ? 'लॉग' : 'logs'}</strong> (${pct}% ${currentLanguage === 'HI' ? 'कुल प्रवाह का' : 'of total run'})`;
+      banner.classList.remove('d-none');
+    }
   }
   statusPieChart.update();
 }
 
 // -------------------------------------------------------------
-// 5. Modals & PDF Compliance Export
+// 5. Dynamic Modals & PDF Compliance Export
 // -------------------------------------------------------------
 function openMetricModal(metricKey) {
   if (!rawTelemetryHistory || rawTelemetryHistory.length === 0) return;
 
+  const isHindi = (currentLanguage === 'HI');
   const latest = rawTelemetryHistory[rawTelemetryHistory.length - 1];
   const labels = rawTelemetryHistory.slice(-20).map(item => item.Timestamp ? (item.Timestamp.includes(' ') ? item.Timestamp.split(' ')[1] : item.Timestamp) : '');
   
@@ -479,65 +632,88 @@ function openMetricModal(metricKey) {
 
   if (metricKey === 'composite') {
     if (isHpiMode) {
-      title = "Heavy Metal Pollution Index (HPI)";
-      subtitle = "Evaluates toxic heavy metal load from acid mine drainage run-off";
-      valueStr = `${hpiVal} HPI`; standardStr = "HPI <= 100 (Safe Ceiling)"; isCompliant = hpiVal <= 100;
+      title = isHindi ? "भारी धातु प्रदूषण सूचकांक (HPI)" : "Heavy Metal Pollution Index (HPI)";
+      subtitle = isHindi ? "एसिड माइन ड्रेनेज रन-ऑफ से विषाक्त भारी धातु भार का मूल्यांकन" : "Evaluates toxic heavy metal load from acid mine drainage run-off";
+      valueStr = `${hpiVal} HPI`;
+      standardStr = isHindi ? "HPI ≤ 100 (सुरक्षित सीमा)" : "HPI <= 100 (Safe Ceiling)";
+      isCompliant = hpiVal <= 100;
       lineColor = "#ef4444"; fillColor = "rgba(239, 68, 68, 0.2)";
       chartData = rawTelemetryHistory.slice(-20).map(i => computeHpi(Number(i.Iron_mgL || 0), Number(i.TDS_PPM || 0)));
       thresholdLine = 100;
     } else {
-      title = "Water Quality Index (IS 10500 Composite)";
-      subtitle = "Potability indicator based on Fe, pH, Turbidity, and TDS sub-indices";
-      valueStr = `${wqiVal} / 100`; standardStr = ">= 70 (Drinking Safe)"; isCompliant = wqiVal >= 70;
+      title = isHindi ? "जल गुणवत्ता सूचकांक (IS 10500 Composite)" : "Water Quality Index (IS 10500 Composite)";
+      subtitle = isHindi ? "Fe, pH, गंदलापन और TDS उप-सूचकांकों पर आधारित पेयता संकेतक" : "Potability indicator based on Fe, pH, Turbidity, and TDS sub-indices";
+      valueStr = `${wqiVal} / 100`;
+      standardStr = isHindi ? "≥ 70 (पीने योग्य सुरक्षित)" : ">= 70 (Drinking Safe)";
+      isCompliant = wqiVal >= 70;
       lineColor = "#0284c7"; fillColor = "rgba(2, 132, 199, 0.2)";
       chartData = rawTelemetryHistory.slice(-20).map(i => i.WQI !== undefined ? Number(i.WQI) : computeFallbackWqi(i));
       thresholdLine = 70;
     }
   } else if (metricKey === 'iron') {
-    title = "Dissolved Iron (Fe²⁺ / Fe³⁺)";
-    subtitle = "Absorbance measured via TCS34725 optical sensor";
-    valueStr = `${feVal.toFixed(2)} mg/L`; standardStr = "<= 0.30 mg/L (Permissible Cutoff)"; isCompliant = feVal <= 0.30;
+    title = isHindi ? "घुलित लोहा (Fe²⁺ / Fe³⁺)" : "Dissolved Iron (Fe²⁺ / Fe³⁺)";
+    subtitle = isHindi ? "TCS34725 ऑप्टिकल सेंसर द्वारा मापा गया अवशोषण" : "Absorbance measured via TCS34725 optical sensor";
+    valueStr = `${feVal.toFixed(2)} mg/L`;
+    standardStr = isHindi ? "≤ 0.30 mg/L (अनुमेय मानक)" : "<= 0.30 mg/L (Permissible Cutoff)";
+    isCompliant = feVal <= 0.30;
     lineColor = "#8b5cf6"; fillColor = "rgba(139, 92, 246, 0.2)";
     chartData = rawTelemetryHistory.slice(-20).map(i => Number(i.Iron_mgL || 0));
     thresholdLine = 0.30;
   } else if (metricKey === 'ph') {
-    title = "Acidity / Basicity (pH)";
-    subtitle = "Hydrogen-ion activity acquired via analog glass probe";
-    valueStr = `${phVal.toFixed(2)}`; standardStr = "6.5 - 8.5 (Neutral Range)"; isCompliant = phVal >= 6.5 && phVal <= 8.5;
+    title = isHindi ? "अम्लीयता / क्षारीयता (pH)" : "Acidity / Basicity (pH)";
+    subtitle = isHindi ? "एनालॉग ग्लास प्रोब द्वारा मापी गई हाइड्रोजन-आयन गतिविधि" : "Hydrogen-ion activity acquired via analog glass probe";
+    valueStr = `${phVal.toFixed(2)}`;
+    standardStr = isHindi ? "6.5 - 8.5 (तटस्थ सीमा)" : "6.5 - 8.5 (Neutral Range)";
+    isCompliant = phVal >= 6.5 && phVal <= 8.5;
     lineColor = "#10b981"; fillColor = "rgba(16, 185, 129, 0.2)";
     chartData = rawTelemetryHistory.slice(-20).map(i => Number(i.pH || 7.0));
     thresholdLine = 7.0;
   } else if (metricKey === 'turb') {
-    title = "Turbidity (Colloidal Suspensions)";
-    subtitle = "Scattering measured in Nephelometric Turbidity Units (NTU)";
-    valueStr = `${turbVal.toFixed(1)} NTU`; standardStr = "<= 5.0 NTU (Clarity Standard)"; isCompliant = turbVal <= 5.0;
+    title = isHindi ? "गंदलापन (Turbidity NTU)" : "Turbidity (Colloidal Suspensions)";
+    subtitle = isHindi ? "नेफ्लोमेट्रिक टर्बिडिटी यूनिट्स (NTU) में मापा गया प्रकाश प्रकीर्णन" : "Scattering measured in Nephelometric Turbidity Units (NTU)";
+    valueStr = `${turbVal.toFixed(1)} NTU`;
+    standardStr = isHindi ? "≤ 5.0 NTU (स्पष्टता मानक)" : "<= 5.0 NTU (Clarity Standard)";
+    isCompliant = turbVal <= 5.0;
     lineColor = "#f59e0b"; fillColor = "rgba(245, 158, 11, 0.2)";
     chartData = rawTelemetryHistory.slice(-20).map(i => Number(i.Turbidity_NTU || 0));
     thresholdLine = 5.0;
   } else if (metricKey === 'tds') {
-    title = "Total Dissolved Solids (TDS)";
-    subtitle = "Conductivity of dissolved minerals in parts per million";
-    valueStr = `${Math.round(tdsVal)} PPM`; standardStr = "<= 500 PPM (Desirable Drinking Cutoff)"; isCompliant = tdsVal <= 500;
+    title = isHindi ? "कुल घुलित ठोस (TDS PPM)" : "Total Dissolved Solids (TDS)";
+    subtitle = isHindi ? "पार्ट्स पर मिलियन में मापी गई खनिज चालकता" : "Conductivity of dissolved minerals in parts per million";
+    valueStr = `${Math.round(tdsVal)} PPM`;
+    standardStr = isHindi ? "≤ 500 PPM (वांछनीय सीमा)" : "<= 500 PPM (Desirable Drinking Cutoff)";
+    isCompliant = tdsVal <= 500;
     lineColor = "#ef4444"; fillColor = "rgba(239, 68, 68, 0.2)";
     chartData = rawTelemetryHistory.slice(-20).map(i => Number(i.TDS_PPM || 0));
     thresholdLine = 300;
   } else if (metricKey === 'temp') {
-    title = "Water Temperature";
-    subtitle = "Acquired via DS18B20 digital 1-Wire probe";
-    valueStr = `${tempVal.toFixed(1)} °C`; standardStr = "Ambient Temperature"; isCompliant = true;
+    title = isHindi ? "जल तापमान (°C)" : "Water Temperature";
+    subtitle = isHindi ? "DS18B20 1-वायर डिजिटल प्रोब द्वारा मापा गया" : "Acquired via DS18B20 digital 1-Wire probe";
+    valueStr = `${tempVal.toFixed(1)} °C`;
+    standardStr = isHindi ? "परिवेश तापमान" : "Ambient Temperature";
+    isCompliant = true;
     lineColor = "#06b6d4"; fillColor = "rgba(6, 182, 212, 0.2)";
     chartData = rawTelemetryHistory.slice(-20).map(i => Number(i.Temperature_C || 25));
     thresholdLine = 25.0;
   }
 
-  document.getElementById('modalTitle').innerText = title;
-  document.getElementById('modalSubtitle').innerText = subtitle;
-  document.getElementById('modalValue').innerText = valueStr;
-  document.getElementById('modalStandard').innerText = standardStr;
+  setSafeText('modalTitle', title);
+  setSafeText('modalSubtitle', subtitle);
+  setSafeText('modalValue', valueStr);
+  setSafeText('modalStandard', standardStr);
   
   const badge = document.getElementById('modalStatusBadge');
-  badge.className = isCompliant ? "badge bg-success mt-1" : "badge bg-danger mt-1";
-  badge.innerText = isCompliant ? "Compliant with Standards" : "Exceeds Permissible Limit";
+  if (badge) {
+    badge.className = isCompliant ? "badge bg-success mt-1" : "badge bg-danger mt-1";
+    badge.innerText = isCompliant 
+      ? (isHindi ? "मानकों के अनुरूप (Compliant)" : "Compliant with Standards") 
+      : (isHindi ? "मानक सीमा से अधिक (Unsafe)" : "Exceeds Permissible Limit");
+  }
+
+  setSafeText('txtModalIngestedLabel', isHindi ? "लाइव मापा गया मान" : "Live Ingested Value");
+  setSafeText('txtModalStandardLabel', isHindi ? "मानक सुरक्षा सीमा" : "Standard Threshold");
+  setSafeText('txtModalWaveform', isHindi ? "उच्च-रिज़ॉल्यूशन समय तरंग (Waveform)" : "High-Resolution Temporal Waveform");
+  setSafeText('txtModalCloseBtn', isHindi ? "बंद करें" : "Close");
 
   if (modalChartInstance) modalChartInstance.destroy();
 
@@ -547,8 +723,26 @@ function openMetricModal(metricKey) {
     data: {
       labels: labels,
       datasets: [
-        { label: 'Live Telemetry', data: chartData, borderColor: lineColor, backgroundColor: fillColor, borderWidth: 3, fill: true, tension: 0.35, pointRadius: 4, pointBackgroundColor: lineColor },
-        { label: 'Standard Baseline', data: Array(chartData.length).fill(thresholdLine), borderColor: '#475569', borderDash: [6, 4], borderWidth: 2, pointRadius: 0, fill: false }
+        { 
+          label: isHindi ? 'लाइव टेलीमेट्री' : 'Live Telemetry', 
+          data: chartData, 
+          borderColor: lineColor, 
+          backgroundColor: fillColor, 
+          borderWidth: 3, 
+          fill: true, 
+          tension: 0.35, 
+          pointRadius: 4, 
+          pointBackgroundColor: lineColor 
+        },
+        { 
+          label: isHindi ? 'मानक आधार रेखा' : 'Standard Baseline', 
+          data: Array(chartData.length).fill(thresholdLine), 
+          borderColor: '#475569', 
+          borderDash: [6, 4], 
+          borderWidth: 2, 
+          pointRadius: 0, 
+          fill: false 
+        }
       ]
     },
     options: {
@@ -564,7 +758,7 @@ function openMetricModal(metricKey) {
 
 function generateCompliancePDF() {
   if (!rawTelemetryHistory || rawTelemetryHistory.length === 0) {
-    alert("No telemetry records available to compile report.");
+    alert(currentLanguage === 'HI' ? "रिपोर्ट तैयार करने के लिए कोई टेलीमेट्री रिकॉर्ड उपलब्ध नहीं है।" : "No telemetry records available to compile report.");
     return;
   }
 
@@ -691,9 +885,13 @@ function updateWqiChart() {
 
   wqiTrendChart.data.labels = labels;
   wqiTrendChart.data.datasets[0].data = compositeValues;
-  wqiTrendChart.data.datasets[0].label = isHpiMode ? "HPI Index" : "WQI Score";
+  wqiTrendChart.data.datasets[0].label = isHpiMode 
+    ? (currentLanguage === 'HI' ? "HPI सूचकांक" : "HPI Index") 
+    : (currentLanguage === 'HI' ? "WQI स्कोर" : "WQI Score");
   wqiTrendChart.data.datasets[1].data = thresholds;
-  wqiTrendChart.data.datasets[1].label = isHpiMode ? "HPI Ceiling (100)" : "WQI Baseline (70)";
+  wqiTrendChart.data.datasets[1].label = isHpiMode 
+    ? (currentLanguage === 'HI' ? "HPI अधिकतम सीमा (100)" : "HPI Ceiling (100)") 
+    : (currentLanguage === 'HI' ? "WQI सुरक्षित आधार रेखा (70)" : "WQI Baseline (70)");
   wqiTrendChart.update();
 }
 
@@ -703,6 +901,7 @@ function updateWqiChart() {
 async function fetchLiveTelemetry() {
   try {
     const activeNodeKey = clusterNodes[selectedNodeIndex].node_key;
+    const isHindi = (currentLanguage === 'HI');
     
     // Request node-specific latest reading
     const resLatest = await fetch(`/api/latest?node_id=${activeNodeKey}`);
@@ -720,25 +919,30 @@ async function fetchLiveTelemetry() {
       });
       const calculatedHpi = computeHpi(fe, tds);
 
-      document.getElementById('cardWqi').innerText = isHpiMode ? calculatedHpi : calculatedWqi;
-      document.getElementById('cardIron').innerText = fe.toFixed(2);
-      document.getElementById('cardPh').innerText = ph.toFixed(2);
-      document.getElementById('cardTurb').innerText = turb.toFixed(1);
-      document.getElementById('cardTds').innerText = tds;
-      document.getElementById('cardTemp').innerText = temp.toFixed(1);
+      setSafeText('cardWqi', isHpiMode ? calculatedHpi : calculatedWqi);
+      setSafeText('cardIron', fe.toFixed(2));
+      setSafeText('cardPh', ph.toFixed(2));
+      setSafeText('cardTurb', turb.toFixed(1));
+      setSafeText('cardTds', tds);
+      setSafeText('cardTemp', temp.toFixed(1));
 
       applyPeripheryThresholds({ wqi: calculatedWqi, iron: fe, ph: ph, turbidity: turb, tds: tds, temperature: temp });
 
       // Feature 1: Stoichiometric Lime Dispenser
       const limeVal = latest.lime_dosing_g_m3 !== undefined ? latest.lime_dosing_g_m3 : 0.0;
-      const elLime = document.getElementById('valLimeDosing');
-      if (elLime) elLime.innerText = Number(limeVal).toFixed(1);
+      setSafeText('valLimeDosing', Number(limeVal).toFixed(1));
 
       const elLimeTxt = document.getElementById('txtLimeStatus');
       if (elLimeTxt) {
-        elLimeTxt.innerText = limeVal > 0 
-          ? `Acidic AMD surge: Dosing ${Number(limeVal).toFixed(1)}g Ca(OH)₂ per m³`
-          : "Neutral buffer: Zero lime required";
+        if (limeVal > 0) {
+          elLimeTxt.innerText = isHindi 
+            ? `अम्लीय अपवाह प्रवाह: खुराक ${Number(limeVal).toFixed(1)}g Ca(OH)₂ प्रति मी³`
+            : `Acidic AMD surge: Dosing ${Number(limeVal).toFixed(1)}g Ca(OH)₂ per m³`;
+        } else {
+          elLimeTxt.innerText = isHindi 
+            ? "तटस्थ बफर: किसी चूने की आवश्यकता नहीं"
+            : "Neutral buffer: Zero lime required";
+        }
       }
 
       // Feature 5: Multi-Heavy Metal Proxy Model (Mn & SO4)
@@ -766,59 +970,84 @@ async function fetchLiveTelemetry() {
 
       const classification = classifyWaterUsage(calculatedWqi, fe, ph, tds, turb);
 
-      // Public Health Outbreak Meter
+      // Epidemiological Health Risk Meter
       const toxicPct = Math.min(100, Math.round((fe / 5.0) * 100));
       const pathogenPct = Math.min(100, Math.round((turb / 15.0) * 100));
       
       const barToxic = document.getElementById('riskBarToxic');
       const txtToxic = document.getElementById('riskTextToxic');
-      barToxic.style.width = `${toxicPct}%`;
-      if (toxicPct > 60) {
-        barToxic.className = "progress-bar bg-danger"; txtToxic.className = "fw-bold text-danger"; txtToxic.innerText = "Severe Heavy Metal Threat";
-      } else if (toxicPct > 30) {
-        barToxic.className = "progress-bar bg-warning"; txtToxic.className = "fw-bold text-warning"; txtToxic.innerText = "Moderate Ingestion Risk";
-      } else {
-        barToxic.className = "progress-bar bg-success"; txtToxic.className = "fw-bold text-success"; txtToxic.innerText = "Safe (IS 10500 Compliant)";
+      if (barToxic && txtToxic) {
+        barToxic.style.width = `${toxicPct}%`;
+        if (toxicPct > 60) {
+          barToxic.className = "progress-bar bg-danger";
+          txtToxic.className = "fw-bold text-danger";
+          txtToxic.innerText = isHindi ? "गंभीर भारी धातु खतरा" : "Severe Heavy Metal Threat";
+        } else if (toxicPct > 30) {
+          barToxic.className = "progress-bar bg-warning";
+          txtToxic.className = "fw-bold text-warning";
+          txtToxic.innerText = isHindi ? "मध्यम अंतर्ग्रहण जोखिम" : "Moderate Ingestion Risk";
+        } else {
+          barToxic.className = "progress-bar bg-success";
+          txtToxic.className = "fw-bold text-success";
+          txtToxic.innerText = isHindi ? "सुरक्षित (IS 10500 मानक)" : "Safe (IS 10500 Compliant)";
+        }
       }
 
       const barPathogen = document.getElementById('riskBarPathogen');
       const txtPathogen = document.getElementById('riskTextPathogen');
-      barPathogen.style.width = `${pathogenPct}%`;
-      if (pathogenPct > 50) {
-        barPathogen.className = "progress-bar bg-danger"; txtPathogen.className = "fw-bold text-danger"; txtPathogen.innerText = "High Pathogen Turbidity";
-      } else {
-        barPathogen.className = "progress-bar bg-success"; txtPathogen.className = "fw-bold text-success"; txtPathogen.innerText = "UV-C Disinfected (Clean)";
+      if (barPathogen && txtPathogen) {
+        barPathogen.style.width = `${pathogenPct}%`;
+        if (pathogenPct > 50) {
+          barPathogen.className = "progress-bar bg-danger";
+          txtPathogen.className = "fw-bold text-danger";
+          txtPathogen.innerText = isHindi ? "उच्च रोगजनक गंदलापन" : "High Pathogen Turbidity";
+        } else {
+          barPathogen.className = "progress-bar bg-success";
+          txtPathogen.className = "fw-bold text-success";
+          txtPathogen.innerText = isHindi ? "यूवी-सी कीटाणुरहित (स्वच्छ)" : "UV-C Disinfected (Clean)";
+        }
       }
 
       const overallHealth = document.getElementById('healthOverallBadge');
-      if (toxicPct > 50 || pathogenPct > 50) {
-        overallHealth.className = "badge bg-danger"; overallHealth.innerText = "Community Risk Alert";
-      } else {
-        overallHealth.className = "badge bg-success"; overallHealth.innerText = "Low Population Risk";
+      if (overallHealth) {
+        if (toxicPct > 50 || pathogenPct > 50) {
+          overallHealth.className = "badge bg-danger";
+          overallHealth.innerText = isHindi ? "सामुदायिक जोखिम चेतावनी" : "Community Risk Alert";
+        } else {
+          overallHealth.className = "badge bg-success";
+          overallHealth.innerText = isHindi ? "कम जनसंख्या जोखिम" : "Low Population Risk";
+        }
       }
 
-      // Hydraulic Fluid Line Pulse
+      // Hydraulic Fluid Line Flow
       const fluidTube = document.getElementById('activeFlowFluid');
       const outletState = document.getElementById('flowOutletState');
 
-      if (classification.tier === 'Drinkable') {
-        banner.className = "alert alert-success d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
-        outletState.className = "badge bg-success mt-1";
-        outletState.innerText = "Potable";
-        fluidTube.className = "pipe-fluid flow-cyan";
-      } else if (classification.tier === 'Agriculture') {
-        banner.className = "alert alert-warning d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
-        outletState.className = "badge bg-warning text-dark mt-1";
-        outletState.innerText = "Irrigation";
-        fluidTube.className = "pipe-fluid flow-amber";
-      } else {
-        banner.className = "alert alert-danger d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
-        outletState.className = "badge bg-danger mt-1";
-        outletState.innerText = "Unusable";
-        fluidTube.className = "pipe-fluid flow-red";
+      if (banner && outletState && fluidTube) {
+        if (classification.tier === 'Drinkable') {
+          banner.className = "alert alert-success d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
+          outletState.className = "badge bg-success mt-1";
+          outletState.innerText = isHindi ? "पीने योग्य" : "Potable";
+          fluidTube.className = "pipe-fluid flow-cyan";
+        } else if (classification.tier === 'Agriculture') {
+          banner.className = "alert alert-warning d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
+          outletState.className = "badge bg-warning text-dark mt-1";
+          outletState.innerText = isHindi ? "सिंचाई योग्य" : "Irrigation";
+          fluidTube.className = "pipe-fluid flow-amber";
+        } else {
+          banner.className = "alert alert-danger d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
+          outletState.className = "badge bg-danger mt-1";
+          outletState.innerText = isHindi ? "अनुपयोगी" : "Unusable";
+          fluidTube.className = "pipe-fluid flow-red";
+        }
       }
-      statusText.innerText = `Status: ${classification.label} (WQI: ${calculatedWqi})`;
-      modeBadge.innerText = latest.mode;
+      
+      if (statusText) {
+        statusText.innerText = `${isHindi ? 'स्थिति' : 'Status'}: ${classification.label} (WQI: ${calculatedWqi})`;
+      }
+      if (modeBadge) {
+        modeBadge.innerText = latest.mode;
+      }
     }
 
     // Request node-specific history
@@ -880,7 +1109,8 @@ async function fetchLiveTelemetry() {
         </tr>` + tableRows;
       });
 
-      document.getElementById('dataTableBody').innerHTML = tableRows;
+      const tableBody = document.getElementById('dataTableBody');
+      if (tableBody) tableBody.innerHTML = tableRows;
 
       // Update Sparklines
       const sliceCount = -15;
@@ -910,7 +1140,7 @@ async function fetchLiveTelemetry() {
       sparkTemp.data.datasets[0].data = sparkTempData.slice(sliceCount);
       sparkTemp.update();
 
-      // Update Parameter Line Chart
+      // Update Line Comparison Chart
       lineComparisonChart.data.labels = labels.slice(-25);
       lineComparisonChart.data.datasets[0].data = tdsCurrent.slice(-25);
       lineComparisonChart.data.datasets[1].data = tdsTarget.slice(-25);
@@ -1005,11 +1235,13 @@ function applyPeripheryThresholds(data) {
 }
 
 // -------------------------------------------------------------
-// Feature 6: Interactive Panchayat Voice / IVRS Broadcast
+// 7. Interactive Panchayat Voice / IVRS Broadcast
 // -------------------------------------------------------------
 function playPanchayatVoiceAdvisory() {
   if (!('speechSynthesis' in window)) {
-    alert("Web Speech synthesis is not supported in this browser.");
+    alert(currentLanguage === 'HI' 
+      ? "यह ब्राउज़र वेब वाक् संश्लेषण (Web Speech API) का समर्थन नहीं करता है।" 
+      : "Web Speech synthesis is not supported in this browser.");
     return;
   }
 
@@ -1042,8 +1274,9 @@ function playPanchayatVoiceAdvisory() {
 
   window.speechSynthesis.speak(utterance);
 }
+
 // -------------------------------------------------------------
-// Drawer Menu Triggers: ROI Modal & Voice Advisory
+// 8. Drawer Menu Triggers: ROI Modal & Voice Advisory
 // -------------------------------------------------------------
 function openRoiModal() {
   const drawerEl = document.getElementById('appMenuOffcanvas');
@@ -1057,14 +1290,16 @@ function openRoiModal() {
 function triggerMenuVoiceAdvisory() {
   const badge = document.getElementById('menuVoiceBadge');
   if (badge) {
-    badge.innerText = "Broadcasting...";
+    badge.innerText = currentLanguage === 'HI' ? "प्रसारित हो रहा है..." : "Broadcasting...";
     badge.className = "badge bg-warning text-dark";
     setTimeout(() => {
-      badge.innerText = "Broadcast";
+      badge.innerText = currentLanguage === 'HI' ? "प्रसारित करें" : "Broadcast";
       badge.className = "badge bg-danger";
     }, 3500);
   }
   playPanchayatVoiceAdvisory();
 }
+
+// Start polling
 setInterval(fetchLiveTelemetry, 3000);
 fetchLiveTelemetry();
