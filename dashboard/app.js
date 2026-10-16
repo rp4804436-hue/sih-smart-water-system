@@ -15,13 +15,13 @@ const gisModal = new bootstrap.Modal(document.getElementById('gisModal'));
 const roiModal = new bootstrap.Modal(document.getElementById('roiModal'));
 
 // -------------------------------------------------------------
-// 1. GIS Multi-Node Registry with Routing Keys
+// 1. Rural Jal Nigam Water Tank Multi-Node Registry
 // -------------------------------------------------------------
 const clusterNodes = [
-  { id: 0, node_key: "dhanbad_01", name: "Node-01: Dhanbad Washery", lat: 23.7957, lng: 86.4304, status: "High Solids / AMD", color: "#ef4444" },
-  { id: 1, node_key: "bokaro_02",  name: "Node-02: Bokaro Pit Drain", lat: 23.6693, lng: 86.1511, status: "Moderate Acidity", color: "#f59e0b" },
-  { id: 2, node_key: "ramgarh_03", name: "Node-03: Ramgarh Tailings Pond", lat: 23.6334, lng: 85.5147, status: "Severe Acidic Run-off", color: "#ef4444" },
-  { id: 3, node_key: "ranchi_04",  name: "Node-04: Ranchi Rural Borewell", lat: 23.3441, lng: 85.3096, status: "IS 10500 Potable", color: "#10b981" }
+  { id: 0, node_key: "oht_sector_01", name: "Jal Nigam OHT-01: Main Habitation Tank",   lat: 26.8500, lng: 80.9500, status: "High Iron / Silt Runoff", color: "#ef4444" },
+  { id: 1, node_key: "oht_sector_02", name: "Jal Nigam OHT-02: North Hamlet Feeder",     lat: 26.8650, lng: 80.9650, status: "Moderate Acidity / Turbid", color: "#f59e0b" },
+  { id: 2, node_key: "oht_sector_03", name: "Jal Nigam OHT-03: Agricultural Border Tank", lat: 26.8350, lng: 80.9350, status: "Elevated TDS & Mineral Load", color: "#f59e0b" },
+  { id: 3, node_key: "oht_sector_04", name: "Jal Nigam OHT-04: Community Core Supply",    lat: 26.8400, lng: 80.9600, status: "IS 10500 Potable", color: "#10b981" }
 ];
 
 let selectedNodeIndex = 0;
@@ -30,7 +30,7 @@ const markers = [];
 
 function initMap() {
   if (map) return;
-  map = L.map('gisMap', { zoomControl: true }).setView([23.65, 85.85], 8);
+  map = L.map('gisMap', { zoomControl: true }).setView([26.85, 80.95], 12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
     attribution: '© OpenStreetMap contributors'
@@ -144,32 +144,32 @@ function dispatchWhatsAppAlert() {
   
   const msg = encodeURIComponent(
     `🚨 *JALDRISHTI WATER CONTAMINATION ADVISORY*\n` +
-    `📍 Location: ${node}\n` +
+    `📍 Installation: ${node}\n` +
     `📊 WQI Score: ${wqi}/100\n` +
     `🧪 Dissolved Fe: ${Number(latest.Iron_mgL).toFixed(2)} mg/L (Limit: 0.30)\n` +
     `🌡️ pH: ${Number(latest.pH).toFixed(2)} | Turbidity: ${Number(latest.Turbidity_NTU).toFixed(1)} NTU\n` +
-    `⚠️ Usability: ${latest.Status === 'Safe' ? 'Drinking Safe (पेयजल योग्य)' : 'CONTAMINATED - DO NOT DRINK (असुरक्षित जल)'}\n` +
-    `ℹ️ Auto-Dispatched via Team Circuit X Edge Node (SIH 26040).`
+    `⚠️ Status: ${latest.Status === 'Safe' ? 'Drinking Safe (पेयजल योग्य)' : 'CONTAMINATED - DO NOT DRINK (असुरक्षित जल)'}\n` +
+    `ℹ️ Auto-Dispatched via JalDrishti Rural Edge Node.`
   );
 
   window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
 }
 
 // -------------------------------------------------------------
-// 2. Comprehensive Localization Dictionary
+// 2. Comprehensive Localization Dictionary (Village-Neutral)
 // -------------------------------------------------------------
 const i18n = {
   EN: {
-    headerSub: "SIH 26040 | Mining & Rural Telemetry Edge Node",
-    schematicHeader: "Closed-Loop Hydraulic Remediation Stream",
-    node1: "Mining Pit",
-    node2: "Greensand",
+    headerSub: "Rural Jal Nigam Tank Telemetry & Autonomous Remediation Node",
+    schematicHeader: "Closed-Loop Hydraulic Remediation & Storage Stream",
+    node1: "Borewell Intake",
+    node2: "Greensand Bed",
     node2Sub: "Fe Stripping",
-    node3: "Sensing",
-    node4: "UV-C Polish",
-    pipeInlet: "Inlet Acidic Run-Off",
+    node3: "Sensing Cell",
+    node4: "UV-C Disinfection",
+    pipeInlet: "Inlet Raw Groundwater",
     pipeMid: "Neutralization & Filtration",
-    pipeOutlet: "Treated Clean Output",
+    pipeOutlet: "Clean Tank Distribution",
     wqiTitle: "Water Quality Index",
     hpiTitle: "Heavy Metal Pollution Index",
     iron: "Dissolved Fe",
@@ -178,9 +178,9 @@ const i18n = {
     tds: "TDS Level",
     temp: "Temperature",
     active: "Active",
-    limeCardTitle: "AMD Neutralization (Lime Dosing)",
+    limeCardTitle: "Water Neutralization (Lime Dosing)",
     limeUnit: "g/m³ intake",
-    proxyTitle: "Surrogate Metal Proxies (IS 10500)",
+    proxyTitle: "Surrogate Mineral & Heavy Metal Proxies (IS 10500)",
     proxyBadge: "ML Surrogate",
     proxyMnLabel: "Est. Manganese (Mn)",
     proxyMnLimit: "Limit: 0.10 mg/L",
@@ -189,21 +189,21 @@ const i18n = {
     filterHeader: "Predictive Filter & Consumable Life",
     filterBed: "Greensand & Activated Carbon Bed",
     filterUv: "Inline UV-C Disinfection Lamp",
-    healthHeader: "Predictive Health Risk & Pathogen Warning",
-    toxicRiskTitle: "Heavy Metal Toxicosis",
-    pathogenRiskTitle: "Gastrointestinal Outbreak",
-    roiHeader: "Unit Economics & Community ROI",
+    healthHeader: "Predictive Habitation Health Risk & Pathogen Warning",
+    toxicRiskTitle: "Heavy Metal Exposure",
+    pathogenRiskTitle: "Gastrointestinal Risk",
+    roiHeader: "Unit Economics & Habitation ROI",
     costPerLitre: "Purification Cost",
-    tankerBenchmark: "Tanker Supply",
+    tankerBenchmark: "Commercial Tanker",
     netSavings: "Net Savings",
     trendHeader: "Water Quality Index (WQI) vs Time",
-    trendSub: "Longitudinal trend derived via IS 10500 weighted sub-indices",
-    traceHeader: "Live Parameter Traces vs Thresholds",
+    trendSub: "Longitudinal quality trend derived via IS 10500 standards",
+    traceHeader: "Live Parameter Traces vs Standards",
     donutHeader: "Water Usability Ratio",
     drinkable: "Drinkable / Household",
-    agriculture: "Agriculture Purpose",
-    unusable: "Unusable / Undrinkable",
-    menuClusterTitle: "Active Cluster Node",
+    agriculture: "Agriculture / Irrigation",
+    unusable: "Unusable / Raw Discharge",
+    menuClusterTitle: "Active Jal Nigam Tank Node",
     menuOpsHeader: "Operations & Preferences",
     menuLangTitle: "Language (भाषा)",
     menuVoiceTitle: "Panchayat IVRS Voice",
@@ -217,7 +217,7 @@ const i18n = {
     menuPdf: "Export Audit PDF",
     menuCsv: "Download Raw CSV",
     menuCsvBadge: "Records",
-    menuGis: "GIS Mining Cluster Grid",
+    menuGis: "GIS Habitation Tank Grid",
     menuGisBadge: "Map",
     menuDiag: "Sensor Diagnostics",
     menuDiagBadge: "Hardware",
@@ -227,22 +227,22 @@ const i18n = {
     modalStandardLabel: "Standard Threshold",
     modalWaveform: "High-Resolution Temporal Waveform",
     modalCloseBtn: "Close",
-    optNode0: "Node-01: Dhanbad Washery",
-    optNode1: "Node-02: Bokaro Pit Drain",
-    optNode2: "Node-03: Ramgarh Tailings Pond",
-    optNode3: "Node-04: Ranchi Rural Borewell"
+    optNode0: "Jal Nigam OHT-01: Main Habitation Tank",
+    optNode1: "Jal Nigam OHT-02: North Hamlet Feeder",
+    optNode2: "Jal Nigam OHT-03: Agricultural Border Tank",
+    optNode3: "Jal Nigam OHT-04: Community Core Supply"
   },
   HI: {
-    headerSub: "एसआईएच 26040 | खनन एवं ग्रामीण जल टेलीमेट्री एज नोड",
-    schematicHeader: "स्वचालित जल शुद्धिकरण एवं प्रवाह प्रणाली",
-    node1: "खनन गड्ढा",
-    node2: "ग्रीनसैंड",
+    headerSub: "ग्रामीण जल निगम टंकी टेलीमेट्री एवं स्वचालित शुद्धिकरण एज नोड",
+    schematicHeader: "स्वचालित जल शुद्धिकरण एवं टंकी वितरण प्रणाली",
+    node1: "बोरवेल अंतर्वाह",
+    node2: "ग्रीनसैंड बेड",
     node2Sub: "आयरन निष्कासन",
     node3: "सेंसर कक्ष",
     node4: "यूवी-सी शोधन",
-    pipeInlet: "अम्लीय अपशिष्ट जल प्रवेश",
+    pipeInlet: "कच्चा भूजल अंतर्वाह",
     pipeMid: "उदासीनीकरण एवं निस्यंदन",
-    pipeOutlet: "शुद्ध सुरक्षित जल निकासी",
+    pipeOutlet: "शुद्ध सुरक्षित टंकी जल निकासी",
     wqiTitle: "जल गुणवत्ता सूचकांक (WQI)",
     hpiTitle: "भारी धातु प्रदूषण सूचकांक (HPI)",
     iron: "घुलित लोहा (Fe)",
@@ -251,9 +251,9 @@ const i18n = {
     tds: "टीडीएस स्तर (TDS)",
     temp: "तापमान",
     active: "सक्रिय",
-    limeCardTitle: "अम्लीय जल उदासीनीकरण (चूना खुराक)",
+    limeCardTitle: "जल उदासीनीकरण (चूना खुराक)",
     limeUnit: "ग्राम/मी³ प्रवाह",
-    proxyTitle: "सरोगेट भारी धातु अनुमान (IS 10500)",
+    proxyTitle: "सरोगेट खनिज एवं भारी धातु अनुमान (IS 10500)",
     proxyBadge: "एमएल मॉडल",
     proxyMnLabel: "अनुमानित मैंगनीज (Mn)",
     proxyMnLimit: "सीमा: 0.10 मिग्रा/ली",
@@ -262,8 +262,8 @@ const i18n = {
     filterHeader: "फ़िल्टर आयु एवं पूर्वानुमान",
     filterBed: "ग्रीनसैंड व चारकोल बेड",
     filterUv: "यूवी-सी कीटाणुशोधन लैंप",
-    healthHeader: "संभावित स्वास्थ्य जोखिम एवं महामारी चेतावनी",
-    toxicRiskTitle: "भारी धातु विषाक्तता जोखिम",
+    healthHeader: "संभावित ग्रामीण स्वास्थ्य जोखिम एवं महामारी चेतावनी",
+    toxicRiskTitle: "भारी धातु जोखिम",
     pathogenRiskTitle: "उदर/संक्रमण रोग जोखिम",
     roiHeader: "इकाई लागत एवं समुदाय बचत (ROI)",
     costPerLitre: "शुद्धिकरण लागत",
@@ -271,18 +271,18 @@ const i18n = {
     netSavings: "कुल शुद्ध बचत",
     trendHeader: "जल गुणवत्ता सूचकांक (समय अनुसार)",
     trendSub: "IS 10500 मानकों पर आधारित प्रवृत्तियां",
-    traceHeader: "लाइव मापदंड एवं सीमा तुलना",
+    traceHeader: "लाइव मापदंड एवं मानक सीमा",
     donutHeader: "जल उपयोगिता अनुपात",
     drinkable: "पीने योग्य / घरेलू उपयोग",
     agriculture: "कृषि सिंचाई हेतु",
     unusable: "दूषित / अनुपयोगी",
-    menuClusterTitle: "सक्रिय क्लस्टर नोड",
+    menuClusterTitle: "सक्रिय जल निगम टंकी नोड",
     menuOpsHeader: "संचालन एवं प्राथमिकताएं",
     menuLangTitle: "भाषा (Language)",
-    menuVoiceTitle: "पंचायत IVRS ध्वनि संदेश",
+    menuVoiceTitle: "ग्राम पंचायत IVRS ध्वनि संदेश",
     menuVoiceSub: "ऑडियो जल गुणवत्ता परामर्श प्रसारित करें",
     menuVoiceBadge: "प्रसारित करें",
-    menuRoiTitle: "इकाई लागत एवं समुदाय बचत (ROI)",
+    menuRoiTitle: "इकाई लागत एवं बचत (ROI)",
     menuRoiSub: "शुद्धिकरण बनाम टैंकर आपूर्ति लागत",
     menuRecords: "परिचालन रिकॉर्ड लॉग",
     menuViewTable: "तालिका देखें",
@@ -290,20 +290,20 @@ const i18n = {
     menuPdf: "ऑडिट PDF डाउनलोड",
     menuCsv: "रॉ CSV डाउनलोड करें",
     menuCsvBadge: "रिकॉर्ड्स",
-    menuGis: "GIS खनन क्लस्टर ग्रिड",
+    menuGis: "GIS ग्रामीण टंकी ग्रिड",
     menuGisBadge: "मानचित्र",
     menuDiag: "सेंसर निदान एवं स्थिति",
     menuDiagBadge: "हार्डवेयर",
-    menuWa: "पंचायत को सूचित करें (WhatsApp)",
+    menuWa: "ग्राम पंचायत को सूचित करें (WhatsApp)",
     menuWaBadge: "अलर्ट भेजें",
     modalIngestedLabel: "लाइव मापा गया मान",
     modalStandardLabel: "मानक सुरक्षा सीमा",
     modalWaveform: "उच्च-रिज़ॉल्यूशन समय तरंग (Waveform)",
     modalCloseBtn: "बंद करें",
-    optNode0: "नोड-01: धनबाद वाशरी",
-    optNode1: "नोड-02: बोकारो पिट ड्रेन",
-    optNode2: "नोड-03: रामगढ़ टेलिंग्स पौंड",
-    optNode3: "नोड-04: रांची ग्रामीण बोरवेल"
+    optNode0: "जल निगम OHT-01: मुख्य बस्ती टंकी",
+    optNode1: "जल निगम OHT-02: उत्तरी मजरा फीडर",
+    optNode2: "जल निगम OHT-03: कृषि सीमावर्ती टंकी",
+    optNode3: "जल निगम OHT-04: सामुदायिक मुख्य आपूर्ति"
   }
 };
 
@@ -633,7 +633,7 @@ function openMetricModal(metricKey) {
   if (metricKey === 'composite') {
     if (isHpiMode) {
       title = isHindi ? "भारी धातु प्रदूषण सूचकांक (HPI)" : "Heavy Metal Pollution Index (HPI)";
-      subtitle = isHindi ? "एसिड माइन ड्रेनेज रन-ऑफ से विषाक्त भारी धातु भार का मूल्यांकन" : "Evaluates toxic heavy metal load from acid mine drainage run-off";
+      subtitle = isHindi ? "कच्चे भूजल अंतर्वाह से भारी धातु भार का मूल्यांकन" : "Evaluates heavy metal load from raw groundwater inflow";
       valueStr = `${hpiVal} HPI`;
       standardStr = isHindi ? "HPI ≤ 100 (सुरक्षित सीमा)" : "HPI <= 100 (Safe Ceiling)";
       isCompliant = hpiVal <= 100;
@@ -770,12 +770,12 @@ function generateCompliancePDF() {
 
   doc.setFontSize(15);
   doc.setTextColor(255, 255, 255);
-  doc.text("JalDrishti(H2O) | WATER QUALITY AUDIT CERTIFICATE", 14, 15);
+  doc.text("JalDrishti(H2O) | RURAL DRINKING WATER AUDIT CERTIFICATE", 14, 15);
 
   doc.setFontSize(9);
   doc.setTextColor(51, 65, 85);
-  doc.text("Regulatory Verification Standard: CPCB & IS 10500:2012 Drinking Water Specification", 14, 32);
-  doc.text(`Node: ${clusterNodes[selectedNodeIndex].name} | Generated: ${new Date().toLocaleString()}`, 14, 37);
+  doc.text("Regulatory Verification Standard: National Rural Drinking Water Program & IS 10500:2012", 14, 32);
+  doc.text(`Installation: ${clusterNodes[selectedNodeIndex].name} | Generated: ${new Date().toLocaleString()}`, 14, 37);
 
   const totalLogs = rawTelemetryHistory.length;
   const avgWqi = (rawTelemetryHistory.reduce((acc, row) => acc + (Number(row.WQI) || computeFallbackWqi(row)), 0) / totalLogs).toFixed(1);
@@ -813,7 +813,7 @@ function generateCompliancePDF() {
   const finalY = doc.lastAutoTable.finalY + 14;
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
-  doc.text("Approved by: Automated Telemetry Ingestion Engine | Team Circuit X | Smart India Hackathon (SIH 26040)", 14, finalY);
+  doc.text("Approved by: JalDrishti Automated Telemetry Ingestion Engine | Over-Head Tank (OHT) Node", 14, finalY);
 
   doc.save(`JalDrishti_Audit_${clusterNodes[selectedNodeIndex].node_key}_${Date.now()}.pdf`);
 }
@@ -936,12 +936,12 @@ async function fetchLiveTelemetry() {
       if (elLimeTxt) {
         if (limeVal > 0) {
           elLimeTxt.innerText = isHindi 
-            ? `अम्लीय अपवाह प्रवाह: खुराक ${Number(limeVal).toFixed(1)}g Ca(OH)₂ प्रति मी³`
-            : `Acidic AMD surge: Dosing ${Number(limeVal).toFixed(1)}g Ca(OH)₂ per m³`;
+            ? `जल अम्लीयता सुधार: खुराक ${Number(limeVal).toFixed(1)}g Ca(OH)₂ प्रति मी³`
+            : `Acidic inflow buffer: Dosing ${Number(limeVal).toFixed(1)}g Ca(OH)₂ per m³`;
         } else {
           elLimeTxt.innerText = isHindi 
-            ? "तटस्थ बफर: किसी चूने की आवश्यकता नहीं"
-            : "Neutral buffer: Zero lime required";
+            ? "तटस्थ बफर: किसी रासायनिक खुराक की आवश्यकता नहीं"
+            : "Neutral buffer: Zero chemical dosing required";
         }
       }
 
