@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>JalDrishti (H2O) | Smart Water Purification & Telemetry</title>
   
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0284c7">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💧</text></svg>">
 
   <!-- Bootstrap 5 & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -32,11 +33,17 @@
       --border-color: #334155;
     }
 
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+
     body {
       background-color: var(--bg-canvas);
       color: var(--text-main);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       transition: background-color 0.3s ease, color 0.3s ease;
+      touch-action: manipulation;
     }
 
     .card {
@@ -62,7 +69,7 @@
       color: #94a3b8 !important;
     }
 
-    body.dark-mode .display-6,
+    body.dark-mode .metric-val,
     body.dark-mode h1,
     body.dark-mode h2,
     body.dark-mode h3,
@@ -74,7 +81,6 @@
       color: #f8fafc !important;
     }
 
-    /* Modal & Table styling in dark mode */
     body.dark-mode .modal-header,
     body.dark-mode .modal-footer {
       border-color: #334155;
@@ -105,6 +111,33 @@
 
     .safe-periphery { border-left-color: #10b981 !important; }
     .danger-periphery { border-left-color: #ef4444 !important; }
+
+    /* Fluid responsive font scaling for metric numbers */
+    .metric-val {
+      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    /* Horizontal scroll track for station pills without breaking page layout */
+    .pill-scroll-container {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 0.35rem;
+    }
+    .pill-scroll-container::-webkit-scrollbar {
+      height: 4px;
+    }
+    .pill-scroll-container::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    body.dark-mode .pill-scroll-container::-webkit-scrollbar-thumb {
+      background: #475569;
+    }
 
     /* Hydraulic Stream Track & Continuous Flowing Animation */
     .pipe-track {
@@ -164,28 +197,41 @@
     }
 
     .sparkline-box {
-      height: 48px;
+      height: 38px;
       width: 100%;
     }
 
     #gisMap {
-      height: 380px;
+      height: clamp(260px, 50vh, 380px);
       width: 100%;
       border-radius: 8px;
+    }
+
+    /* Mobile schematic layout adaptation */
+    @media (max-width: 576px) {
+      .schematic-labels {
+        font-size: 0.7rem !important;
+      }
+      .stat-card {
+        padding: 0.75rem !important;
+      }
+      .card-composite-title {
+        font-size: 0.75rem !important;
+      }
     }
   </style>
 </head>
 <body class="p-2 p-md-4">
-  <div class="container-fluid max-w-7xl">
+  <div class="container-fluid max-w-7xl px-1 px-md-3">
     
     <!-- Top Header -->
-    <header class="d-flex justify-content-between align-items-center pb-3 mb-3 border-bottom">
+    <header class="d-flex justify-content-between align-items-center pb-2 pb-md-3 mb-2 mb-md-3 border-bottom">
       <div>
-        <h1 class="h3 fw-bold mb-0 text-primary d-flex align-items-center gap-2">
+        <h1 class="h4 h3-md fw-bold mb-0 text-primary d-flex align-items-center gap-2">
           <span>JalDrishti(H₂O)</span>
-          <span class="badge bg-primary fs-6 fw-normal">Jal Nigam Edge</span>
+          <span class="badge bg-primary d-none d-sm-inline-block fs-6 fw-normal">Jal Nigam Edge</span>
         </h1>
-        <p id="txtHeaderSubtitle" class="text-secondary small mb-0">Rural Jal Nigam Tank Telemetry & Autonomous Remediation Node</p>
+        <p id="txtHeaderSubtitle" class="text-secondary small mb-0 text-truncate" style="max-width: 260px;">Rural Jal Nigam Tank Telemetry Node</p>
       </div>
       <div class="d-flex gap-2">
         <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1 shadow-xs" onclick="toggleLanguage()">
@@ -198,7 +244,7 @@
     </header>
 
     <!-- Top Station Navigation Pills -->
-    <div class="d-flex gap-2 overflow-x-auto pb-2 mb-3">
+    <div class="pill-scroll-container mb-3">
       <button id="pillNode0" class="btn btn-sm btn-primary text-nowrap py-1 px-3 rounded-pill shadow-xs" onclick="selectClusterNode(0)">🚰 Lucknow (Main Tank-1)</button>
       <button id="pillNode1" class="btn btn-sm btn-outline-secondary text-nowrap py-1 px-3 rounded-pill shadow-xs" onclick="selectClusterNode(1)">🚰 Lucknow (Main Tank-2)</button>
       <button id="pillNode2" class="btn btn-sm btn-outline-secondary text-nowrap py-1 px-3 rounded-pill shadow-xs" onclick="selectClusterNode(2)">🚰 Lucknow (Main Tank-3)</button>
@@ -207,122 +253,122 @@
 
     <!-- Active Contamination / Safety Banner -->
     <div id="alertBanner" class="alert alert-danger d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3">
-      <span id="statusText" class="fw-semibold">Status: Initializing Telemetry...</span>
+      <span id="statusText" class="fw-semibold small">Status: Initializing Telemetry...</span>
       <span id="modeBadge" class="badge bg-secondary">Edge Initializing</span>
     </div>
 
     <!-- Closed-Loop Hydraulic Flow Schematic -->
-    <div class="card p-3 mb-3">
-      <div class="d-flex justify-content-between align-items-center mb-2">
-        <h2 id="txtSchematicHeader" class="h6 fw-bold mb-0">Closed-Loop Hydraulic Remediation & Storage Stream</h2>
+    <div class="card p-2 p-md-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-1 mb-md-2">
+        <h2 id="txtSchematicHeader" class="small fw-bold mb-0">Closed-Loop Hydraulic Stream</h2>
         <span id="flowOutletState" class="badge bg-danger">Evaluating</span>
       </div>
-      <div class="d-flex justify-content-between text-secondary small mb-1">
+      <div class="d-flex justify-content-between text-secondary small mb-1 schematic-labels text-nowrap overflow-hidden">
         <span id="txtNode1">Borewell Intake</span>
-        <span id="txtNode2">Greensand Bed <small id="txtNode2Sub" class="text-muted">(Fe Stripping)</small></span>
+        <span id="txtNode2" class="d-none d-sm-inline">Greensand Bed <small id="txtNode2Sub" class="text-muted">(Fe Stripping)</small></span>
         <span id="txtNode3">Sensing Cell</span>
-        <span id="txtNode4">UV-C Disinfection</span>
+        <span id="txtNode4">UV-C Polish</span>
       </div>
       <div class="pipe-track my-1">
         <div id="activeFlowFluid" class="pipe-fluid flow-red"></div>
       </div>
-      <div class="d-flex justify-content-between text-muted" style="font-size: 0.75rem;">
-        <span id="txtPipeInlet">Inlet Raw Groundwater</span>
-        <span id="txtPipeMid">Neutralization & Filtration</span>
-        <span id="txtPipeOutlet">Clean Tank Distribution</span>
+      <div class="d-flex justify-content-between text-muted" style="font-size: 0.7rem;">
+        <span id="txtPipeInlet">Inlet Groundwater</span>
+        <span id="txtPipeMid" class="d-none d-sm-inline">Treatment Line</span>
+        <span id="txtPipeOutlet">Clean Tank Feed</span>
       </div>
     </div>
 
     <!-- 6 Core Telemetry Metric Cards -->
-    <div class="row g-3 mb-3">
+    <div class="row g-2 g-md-3 mb-3">
       <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 stat-card h-100" onclick="openMetricModal('composite')">
+        <div class="card p-2 p-md-3 stat-card h-100" onclick="openMetricModal('composite')">
           <div class="d-flex justify-content-between align-items-center mb-1">
-            <span id="cardCompositeTitle" class="small text-secondary fw-semibold">Water Quality Index</span>
+            <span id="cardCompositeTitle" class="card-composite-title text-secondary fw-semibold small">Water Quality</span>
             <button id="hpiToggleBadge" class="btn badge bg-primary border-0 p-1" style="font-size: 0.65rem;" onclick="event.stopPropagation(); toggleHpiMode();">HPI</button>
           </div>
           <div class="d-flex align-items-baseline gap-1">
-            <span id="cardWqi" class="display-6 fw-bold">--</span>
+            <span id="cardWqi" class="metric-val">--</span>
             <span id="cardCompositeUnit" class="text-secondary small">/100</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkWqi"></canvas></div>
-          <span id="cardCompositeBenchmark" class="text-muted" style="font-size: 0.72rem;">≥ 70 Safe</span>
+          <span id="cardCompositeBenchmark" class="text-muted" style="font-size: 0.7rem;">≥ 70 Safe</span>
         </div>
       </div>
 
       <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 stat-card h-100" onclick="openMetricModal('iron')">
-          <span id="txtCardIron" class="small text-secondary fw-semibold">Dissolved Fe</span>
+        <div class="card p-2 p-md-3 stat-card h-100" onclick="openMetricModal('iron')">
+          <span id="txtCardIron" class="text-secondary fw-semibold small">Dissolved Fe</span>
           <div class="d-flex align-items-baseline gap-1">
-            <span id="cardIron" class="display-6 fw-bold">--</span>
+            <span id="cardIron" class="metric-val">--</span>
             <span id="cardIronUnit" class="text-secondary small">mg/L</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkIron"></canvas></div>
-          <span class="text-muted" style="font-size: 0.72rem;">≤ 0.30 mg/L</span>
+          <span class="text-muted" style="font-size: 0.7rem;">≤ 0.30 mg/L</span>
         </div>
       </div>
 
       <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 stat-card h-100" onclick="openMetricModal('ph')">
-          <span id="txtCardPh" class="small text-secondary fw-semibold">pH Level</span>
+        <div class="card p-2 p-md-3 stat-card h-100" onclick="openMetricModal('ph')">
+          <span id="txtCardPh" class="text-secondary fw-semibold small">pH Level</span>
           <div class="d-flex align-items-baseline gap-1">
-            <span id="cardPh" class="display-6 fw-bold">--</span>
+            <span id="cardPh" class="metric-val">--</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkPh"></canvas></div>
-          <span class="text-muted" style="font-size: 0.72rem;">6.5 - 8.5 Safe</span>
+          <span class="text-muted" style="font-size: 0.7rem;">6.5 - 8.5 Safe</span>
         </div>
       </div>
 
       <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 stat-card h-100" onclick="openMetricModal('turb')">
-          <span id="txtCardTurb" class="small text-secondary fw-semibold">Turbidity</span>
+        <div class="card p-2 p-md-3 stat-card h-100" onclick="openMetricModal('turb')">
+          <span id="txtCardTurb" class="text-secondary fw-semibold small">Turbidity</span>
           <div class="d-flex align-items-baseline gap-1">
-            <span id="cardTurb" class="display-6 fw-bold">--</span>
+            <span id="cardTurb" class="metric-val">--</span>
             <span id="cardTurbUnit" class="text-secondary small">NTU</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkTurb"></canvas></div>
-          <span class="text-muted" style="font-size: 0.72rem;">≤ 5.0 NTU</span>
+          <span class="text-muted" style="font-size: 0.7rem;">≤ 5.0 NTU</span>
         </div>
       </div>
 
       <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 stat-card h-100" onclick="openMetricModal('tds')">
-          <span id="txtCardTds" class="small text-secondary fw-semibold">TDS Level</span>
+        <div class="card p-2 p-md-3 stat-card h-100" onclick="openMetricModal('tds')">
+          <span id="txtCardTds" class="text-secondary fw-semibold small">TDS Level</span>
           <div class="d-flex align-items-baseline gap-1">
-            <span id="cardTds" class="display-6 fw-bold">--</span>
+            <span id="cardTds" class="metric-val">--</span>
             <span id="cardTdsUnit" class="text-secondary small">PPM</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkTds"></canvas></div>
-          <span class="text-muted" style="font-size: 0.72rem;">≤ 500 PPM</span>
+          <span class="text-muted" style="font-size: 0.7rem;">≤ 500 PPM</span>
         </div>
       </div>
 
       <div class="col-6 col-md-4 col-xl-2">
-        <div class="card p-3 stat-card h-100" onclick="openMetricModal('temp')">
+        <div class="card p-2 p-md-3 stat-card h-100" onclick="openMetricModal('temp')">
           <div class="d-flex justify-content-between align-items-center mb-1">
-            <span id="txtCardTemp" class="small text-secondary fw-semibold">Temperature</span>
-            <span id="txtCardTempActive" class="badge bg-success" style="font-size: 0.65rem;">Active</span>
+            <span id="txtCardTemp" class="text-secondary fw-semibold small">Temp</span>
+            <span id="txtCardTempActive" class="badge bg-success" style="font-size: 0.6rem;">Active</span>
           </div>
           <div class="d-flex align-items-baseline gap-1">
-            <span id="cardTemp" class="display-6 fw-bold">--</span>
+            <span id="cardTemp" class="metric-val">--</span>
             <span id="cardTempUnit" class="text-secondary small">°C</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkTemp"></canvas></div>
-          <span class="text-muted" style="font-size: 0.72rem;">Ambient Monitored</span>
+          <span class="text-muted" style="font-size: 0.7rem;">Monitored</span>
         </div>
       </div>
     </div>
 
     <!-- Closed-Loop Dosing & Heavy Metal Proxies -->
-    <div class="row g-3 mb-3">
+    <div class="row g-2 g-md-3 mb-3">
       <div class="col-12 col-md-6">
         <div class="card p-3 h-100">
           <div class="d-flex justify-content-between align-items-center mb-2">
-            <h2 id="txtLimeCardTitle" class="h6 fw-bold mb-0">Water Neutralization (Lime Dosing)</h2>
+            <h2 id="txtLimeCardTitle" class="small fw-bold mb-0">Water Neutralization (Lime Dosing)</h2>
             <span class="badge bg-primary">Ca(OH)₂</span>
           </div>
           <div class="d-flex align-items-baseline gap-2">
-            <span id="valLimeDosing" class="display-6 fw-bold text-primary">0.0</span>
+            <span id="valLimeDosing" class="metric-val text-primary">0.0</span>
             <span id="txtLimeUnit" class="text-secondary small">g/m³ intake</span>
           </div>
           <p id="txtLimeStatus" class="small text-muted mb-0 mt-1">Neutral buffer: Zero chemical dosing required</p>
@@ -332,19 +378,19 @@
       <div class="col-12 col-md-6">
         <div class="card p-3 h-100">
           <div class="d-flex justify-content-between align-items-center mb-2">
-            <h2 id="txtProxyTitle" class="h6 fw-bold mb-0">Surrogate Mineral & Heavy Metal Proxies (IS 10500)</h2>
+            <h2 id="txtProxyTitle" class="small fw-bold mb-0">Surrogate Heavy Metal Proxies (IS 10500)</h2>
             <span id="txtProxyBadge" class="badge bg-info text-dark">ML Surrogate</span>
           </div>
           <div class="row text-center mt-2">
             <div class="col-6 border-end">
-              <span id="txtProxyMnLabel" class="small text-secondary d-block">Est. Manganese (Mn)</span>
-              <span id="valProxyMn" class="fs-4 fw-bold text-success">--</span>
-              <span id="txtProxyMnLimit" class="d-block text-muted" style="font-size: 0.72rem;">Limit: 0.10 mg/L</span>
+              <span id="txtProxyMnLabel" class="small text-secondary d-block">Est. Manganese</span>
+              <span id="valProxyMn" class="fs-5 fw-bold text-success">--</span>
+              <span id="txtProxyMnLimit" class="d-block text-muted" style="font-size: 0.7rem;">Limit: 0.10 mg/L</span>
             </div>
             <div class="col-6">
-              <span id="txtProxySo4Label" class="small text-secondary d-block">Est. Sulfate (SO₄²⁻)</span>
-              <span id="valProxySo4" class="fs-4 fw-bold text-success">--</span>
-              <span id="txtProxySo4Limit" class="d-block text-muted" style="font-size: 0.72rem;">Limit: 200 mg/L</span>
+              <span id="txtProxySo4Label" class="small text-secondary d-block">Est. Sulfate</span>
+              <span id="valProxySo4" class="fs-5 fw-bold text-success">--</span>
+              <span id="txtProxySo4Limit" class="d-block text-muted" style="font-size: 0.7rem;">Limit: 200 mg/L</span>
             </div>
           </div>
         </div>
@@ -354,25 +400,25 @@
     <!-- Health Risk & Outbreak Meter -->
     <div class="card p-3 mb-3">
       <div class="d-flex justify-content-between align-items-center mb-2">
-        <h2 id="txtHealthHeader" class="h6 fw-bold mb-0">Predictive Habitation Health Risk & Pathogen Warning</h2>
-        <span id="healthOverallBadge" class="badge bg-success">Low Population Risk</span>
+        <h2 id="txtHealthHeader" class="small fw-bold mb-0">Predictive Health Risk Warning</h2>
+        <span id="healthOverallBadge" class="badge bg-success">Low Risk</span>
       </div>
-      <div class="row g-3">
+      <div class="row g-2 g-md-3">
         <div class="col-12 col-md-6">
           <div class="d-flex justify-content-between small mb-1">
             <span id="txtToxicRiskTitle" class="fw-semibold">Heavy Metal Exposure</span>
-            <span id="riskTextToxic" class="fw-bold text-success">Safe (IS 10500 Compliant)</span>
+            <span id="riskTextToxic" class="fw-bold text-success">Safe (IS 10500)</span>
           </div>
-          <div class="progress" style="height: 10px;">
+          <div class="progress" style="height: 8px;">
             <div id="riskBarToxic" class="progress-bar bg-success" style="width: 10%;"></div>
           </div>
         </div>
         <div class="col-12 col-md-6">
           <div class="d-flex justify-content-between small mb-1">
             <span id="txtPathogenRiskTitle" class="fw-semibold">Gastrointestinal Risk</span>
-            <span id="riskTextPathogen" class="fw-bold text-success">UV-C Disinfected (Clean)</span>
+            <span id="riskTextPathogen" class="fw-bold text-success">UV-C Clean</span>
           </div>
-          <div class="progress" style="height: 10px;">
+          <div class="progress" style="height: 8px;">
             <div id="riskBarPathogen" class="progress-bar bg-success" style="width: 10%;"></div>
           </div>
         </div>
@@ -380,13 +426,13 @@
     </div>
 
     <!-- Charts Row -->
-    <div class="row g-3 mb-3">
+    <div class="row g-2 g-md-3 mb-3">
       <div class="col-12 col-lg-8">
         <div class="card p-3 h-100">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <div>
-              <h2 id="txtTrendHeader" class="h6 fw-bold mb-0">Water Quality Index (WQI) vs Time</h2>
-              <small id="txtTrendSubtitle" class="text-muted">Longitudinal quality trend derived via IS 10500 standards</small>
+              <h2 id="txtTrendHeader" class="small fw-bold mb-0">WQI vs Time</h2>
+              <small id="txtTrendSubtitle" class="text-muted d-none d-sm-block">Longitudinal quality trend (IS 10500)</small>
             </div>
             <div class="btn-group btn-group-sm" aria-label="WQI Time Range">
               <button class="btn btn-outline-secondary py-0 px-2" onclick="setWqiRange(1)">24h</button>
@@ -394,25 +440,25 @@
               <button class="btn btn-outline-secondary py-0 px-2" onclick="setWqiRange(30)">30d</button>
             </div>
           </div>
-          <div style="height: 250px;"><canvas id="wqiTrendChart"></canvas></div>
+          <div style="height: 220px;"><canvas id="wqiTrendChart"></canvas></div>
         </div>
       </div>
 
       <div class="col-12 col-lg-4">
         <div class="card p-3 h-100">
-          <h2 id="txtDonutHeader" class="h6 fw-bold mb-2">Water Usability Ratio</h2>
+          <h2 id="txtDonutHeader" class="small fw-bold mb-2">Water Usability Ratio</h2>
           <div id="pieFocusBanner" class="alert alert-light border text-center py-1 px-2 mb-2 shadow-sm d-none">
             <small id="pieFocusText"></small>
           </div>
-          <div style="height: 220px;"><canvas id="statusPieChart"></canvas></div>
+          <div style="height: 200px;"><canvas id="statusPieChart"></canvas></div>
         </div>
       </div>
     </div>
 
     <!-- Parameter Waveforms -->
     <div class="card p-3 mb-3">
-      <h2 id="txtTraceHeader" class="h6 fw-bold mb-2">Live Parameter Traces vs Standards</h2>
-      <div style="height: 240px;"><canvas id="lineComparisonChart"></canvas></div>
+      <h2 id="txtTraceHeader" class="small fw-bold mb-2">Live Parameter Traces vs Standards</h2>
+      <div style="height: 220px;"><canvas id="lineComparisonChart"></canvas></div>
     </div>
 
   </div>
@@ -485,7 +531,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <div>
-            <h3 class="h5 modal-title fw-bold" id="modalTitle">Parameter Analysis</h3>
+            <h3 class="h6 modal-title fw-bold" id="modalTitle">Parameter Analysis</h3>
             <small id="modalSubtitle" class="text-muted"></small>
           </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -502,10 +548,10 @@
               <span id="modalStatusBadge" class="d-block badge bg-success mt-1">Compliant</span>
             </div>
           </div>
-          <h4 id="txtModalWaveform" class="h6 fw-semibold mb-2">High-Resolution Temporal Waveform</h4>
-          <div style="height: 240px;"><canvas id="modalDetailedChart"></canvas></div>
+          <h4 id="txtModalWaveform" class="small fw-semibold mb-2">High-Resolution Temporal Waveform</h4>
+          <div style="height: 200px;"><canvas id="modalDetailedChart"></canvas></div>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer py-1">
           <button id="txtModalCloseBtn" type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
@@ -516,11 +562,11 @@
   <div class="modal fade" id="gisModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="h5 modal-title fw-bold">GIS Habitation Over-Head Tank Grid</h3>
+        <div class="modal-header py-2">
+          <h3 class="h6 modal-title fw-bold">GIS Tank Grid</h3>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body p-2">
+        <div class="modal-body p-1">
           <div id="gisMap"></div>
         </div>
       </div>
@@ -531,10 +577,10 @@
   <div class="modal fade" id="recordsModal" tabindex="-1">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header py-2">
           <div>
-            <h3 class="h5 modal-title fw-bold">Historical Telemetry Ingestion Log</h3>
-            <small id="txtRecordsSubtitle" class="text-muted">3-second continuous sensor audit</small>
+            <h3 class="h6 modal-title fw-bold">Historical Telemetry Ingestion Log</h3>
+            <small id="txtRecordsSubtitle" class="text-muted" style="font-size: 0.7rem;">3-second sensor audit</small>
           </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
