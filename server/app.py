@@ -2,18 +2,27 @@ import os
 import csv
 import math
 import datetime
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 
-app = Flask(__name__)
+# -------------------------------------------------------------
+# 1. Directory Structure & App Routing Configuration
+# -------------------------------------------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Resolves the 'dashboard' folder adjacent to 'server'
+DASHBOARD_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "dashboard"))
+
+# Data directory for persistent CSV files
+DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
+
+# Explicitly configure Flask to recognize dashboard as its static root
+app = Flask(__name__, static_folder=DASHBOARD_DIR, static_url_path="")
 CORS(app)
 
 # -------------------------------------------------------------
-# 1. Multi-Node Registry & Data Storage Configuration
+# 2. Multi-Node Registry Configuration
 # -------------------------------------------------------------
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-os.makedirs(DATA_DIR, exist_ok=True)
-
 VALID_NODES = {
     "lucknow_tank_1": "Lucknow Tank-1",
     "lucknow_tank_2": "Lucknow Tank-2",
@@ -34,12 +43,12 @@ def get_node_csv_path(node_id):
     return os.path.join(DATA_DIR, f"telemetry_{safe_node}.csv")
 
 # -------------------------------------------------------------
-# 2. Stoichiometric Calculations & Environmental Models
+# 3. Stoichiometric Calculations & Environmental Models
 # -------------------------------------------------------------
 def compute_stoichiometric_lime(ph_val, iron_val):
     """
     Computes required Ca(OH)2 lime mass (g/m^3) to neutralize acidity
-    and precipitate soluble iron Fe3+ + 3OH- -> Fe(OH)3.
+    and precipitate soluble iron: Fe3+ + 3OH- -> Fe(OH)3.
     """
     lime_ph = 0.0
     if ph_val < 7.0:
@@ -57,13 +66,13 @@ def compute_wqi(fe, ph, turb, tds):
     """
     Weighted arithmetic Water Quality Index based on IS 10500:2012 standards.
     """
-    # Iron sub-index (Limit 0.30 mg/L)
+    # Iron sub-index (IS 10500 limit 0.30 mg/L)
     if fe <= 0.30:
         q_fe = max(0.0, 100.0 - (fe / 0.30) * 100.0)
     else:
         q_fe = max(0.0, 50.0 - ((fe - 0.30) / 1.0) * 50.0)
 
-    # pH sub-index (Neutral target 7.0, band 6.5 - 8.5)
+    # pH sub-index (Neutral target 7.0, range 6.5 - 8.5)
     q_ph = max(0.0, 100.0 - (abs(ph - 7.0) / 1.5) * 100.0)
 
     # Turbidity sub-index (Limit 5.0 NTU)
@@ -83,7 +92,7 @@ def compute_wqi(fe, ph, turb, tds):
 
 def compute_metal_proxies(fe, ph, tds):
     """
-    Machine Learning surrogate proxies for Manganese (Mn) and Sulfate (SO4).
+    Surrogate proxies for Manganese (Mn) and Sulfate (SO4).
     """
     est_mn = round(fe * 0.18, 3)
     est_so4 = round((tds * 0.42) + max(0.0, (6.5 - ph) * 28.5), 1)
@@ -96,12 +105,11 @@ def compute_metal_proxies(fe, ph, tds):
     }
 
 # -------------------------------------------------------------
-# 3. Automatic Seeding for Fresh / Ephemeral Deployments
+# 4. Storage Auto-Seeding (Prevents Blank Dashboards on Render Boot)
 # -------------------------------------------------------------
 def initialize_node_storage():
     """
-    Seeds historical baseline records if no telemetry CSV exists.
-    Prevents blank UI states on Render restarts.
+    Seeds baseline data on server startup if no CSV records are present.
     """
     tank_baselines = {
         "lucknow_tank_1": {"iron": 0.48, "ph": 6.2, "turb": 6.8, "tds": 380, "temp": 25.2, "mode": "Heavy Purification", "status": "Contaminated"},
@@ -119,7 +127,7 @@ def initialize_node_storage():
                 writer = csv.writer(f)
                 writer.writerow(CSV_HEADERS)
                 
-                # Seed 20 historical intervals
+                # Pre-generate 20 continuous historical points
                 for i in range(20, -1, -1):
                     t_stamp = (base_time - datetime.timedelta(seconds=i * 3)).strftime("%Y-%m-%d %H:%M:%S")
                     fe = round(max(0.05, profile["iron"] + math.sin(i) * 0.04), 2)
@@ -139,13 +147,12 @@ def initialize_node_storage():
 initialize_node_storage()
 
 # -------------------------------------------------------------
-# 4. API Endpoints
+# 5. Core REST API Endpoints
 # -------------------------------------------------------------
 @app.route("/api/telemetry", methods=["POST"])
 def receive_telemetry():
     """
-    Ingests live telemetry from ESP32 edge nodes.
-    Calculates remediation values and returns actuation downlink payload.
+    Ingests live telemetry from edge hardware (ESP32).
     """
     try:
         data = request.get_json(force=True)
@@ -160,7 +167,6 @@ def receive_telemetry():
         temp = float(data.get("temperature", 25.0))
         flow = float(data.get("flow_rate", 10.0))
 
-        # Core calculations
         wqi = compute_wqi(fe, ph, turb, tds)
         lime_dosing = compute_stoichiometric_lime(ph, fe)
         proxies = compute_metal_proxies(fe, ph, tds)
@@ -171,7 +177,6 @@ def receive_telemetry():
 
         timestamp_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        # Append to node CSV
         csv_path = get_node_csv_path(node_id)
         file_exists = os.path.exists(csv_path) and os.path.getsize(csv_path) > 0
         with open(csv_path, mode="a", newline="", encoding="utf-8") as f:
@@ -183,11 +188,9 @@ def receive_telemetry():
                 round(temp, 1), round(flow, 1), lime_dosing, status_str, mode_str
             ])
 
-        # Return actuation downlink payload to ESP32
-        # PWM speed between 90-255 if dosing required
         pwm_val = int(min(255, max(90, lime_dosing * 12))) if lime_dosing > 0 else 0
-        uv_relay = True  # Always energized during active water delivery
-        purge_val = turb > 15.0 or fe > 3.0  # Trigger anti-fouling flush if excessive solids
+        uv_relay = True
+        purge_val = turb > 15.0 or fe > 3.0
 
         return jsonify({
             "status": "success",
@@ -208,7 +211,7 @@ def receive_telemetry():
 @app.route("/api/latest", methods=["GET"])
 def get_latest_telemetry():
     """
-    Returns the single latest reading for a specific tank node.
+    Returns latest telemetry readings for the requested node.
     """
     node_id = request.args.get("node_id", DEFAULT_NODE_ID)
     if node_id not in VALID_NODES:
@@ -254,7 +257,7 @@ def get_latest_telemetry():
 @app.route("/api/history", methods=["GET"])
 def get_telemetry_history():
     """
-    Returns history of records for chart traces and tables.
+    Returns history of records for chart traces and data logs.
     """
     node_id = request.args.get("node_id", DEFAULT_NODE_ID)
     if node_id not in VALID_NODES:
@@ -270,13 +273,12 @@ def get_telemetry_history():
         for r in reader:
             history.append(r)
 
-    # Return up to last 100 entries
     return jsonify(history[-100:]), 200
 
 @app.route("/api/download-csv", methods=["GET"])
 def download_csv():
     """
-    Downloads node-specific telemetry log as CSV file.
+    Exports node records as a CSV file.
     """
     node_id = request.args.get("node_id", DEFAULT_NODE_ID)
     if node_id not in VALID_NODES:
@@ -295,16 +297,23 @@ def download_csv():
 
 @app.route("/api/nodes", methods=["GET"])
 def list_nodes():
-    """
-    Returns all registered Jal Nigam tank nodes.
-    """
     return jsonify([
         {"node_key": k, "name": v} for k, v in VALID_NODES.items()
     ])
 
+# -------------------------------------------------------------
+# 6. Static File Handlers (Resolves 404 on app.js, manifest.json)
+# -------------------------------------------------------------
 @app.route("/")
 def index():
-    return send_file(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "dashboard", "index.html"))
+    return send_from_directory(DASHBOARD_DIR, "index.html")
+
+@app.route("/<path:path>")
+def serve_static(path):
+    file_path = os.path.join(DASHBOARD_DIR, path)
+    if os.path.exists(file_path):
+        return send_from_directory(DASHBOARD_DIR, path)
+    return jsonify({"error": f"File '{path}' not found in dashboard directory"}), 404
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
