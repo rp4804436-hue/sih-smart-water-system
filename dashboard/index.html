@@ -44,6 +44,52 @@
       border-color: var(--border-color);
       border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      color: var(--text-main);
+    }
+
+    /* Complete Dark Mode Text & Contrast Overrides */
+    body.dark-mode .card,
+    body.dark-mode .modal-content,
+    body.dark-mode .offcanvas {
+      background-color: var(--card-bg);
+      color: #f8fafc !important;
+      border-color: var(--border-color);
+    }
+
+    body.dark-mode .text-secondary,
+    body.dark-mode .text-muted,
+    body.dark-mode small {
+      color: #94a3b8 !important;
+    }
+
+    body.dark-mode .display-6,
+    body.dark-mode h1,
+    body.dark-mode h2,
+    body.dark-mode h3,
+    body.dark-mode h4,
+    body.dark-mode h5,
+    body.dark-mode h6,
+    body.dark-mode .fw-bold,
+    body.dark-mode .fw-semibold {
+      color: #f8fafc !important;
+    }
+
+    /* Modal & Table styling in dark mode */
+    body.dark-mode .modal-header,
+    body.dark-mode .modal-footer {
+      border-color: #334155;
+    }
+
+    body.dark-mode .table {
+      color: #f8fafc !important;
+      border-color: #334155;
+    }
+    body.dark-mode .table-striped > tbody > tr:nth-of-type(odd) > * {
+      background-color: rgba(255, 255, 255, 0.03);
+      color: #f8fafc !important;
+    }
+    body.dark-mode .table-striped > tbody > tr:nth-of-type(even) > * {
+      color: #f8fafc !important;
     }
 
     .stat-card {
@@ -209,7 +255,7 @@
           <span id="txtCardIron" class="small text-secondary fw-semibold">Dissolved Fe</span>
           <div class="d-flex align-items-baseline gap-1">
             <span id="cardIron" class="display-6 fw-bold">--</span>
-            <span class="text-secondary small">mg/L</span>
+            <span id="cardIronUnit" class="text-secondary small">mg/L</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkIron"></canvas></div>
           <span class="text-muted" style="font-size: 0.72rem;">≤ 0.30 mg/L</span>
@@ -232,7 +278,7 @@
           <span id="txtCardTurb" class="small text-secondary fw-semibold">Turbidity</span>
           <div class="d-flex align-items-baseline gap-1">
             <span id="cardTurb" class="display-6 fw-bold">--</span>
-            <span class="text-secondary small">NTU</span>
+            <span id="cardTurbUnit" class="text-secondary small">NTU</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkTurb"></canvas></div>
           <span class="text-muted" style="font-size: 0.72rem;">≤ 5.0 NTU</span>
@@ -244,7 +290,7 @@
           <span id="txtCardTds" class="small text-secondary fw-semibold">TDS Level</span>
           <div class="d-flex align-items-baseline gap-1">
             <span id="cardTds" class="display-6 fw-bold">--</span>
-            <span class="text-secondary small">PPM</span>
+            <span id="cardTdsUnit" class="text-secondary small">PPM</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkTds"></canvas></div>
           <span class="text-muted" style="font-size: 0.72rem;">≤ 500 PPM</span>
@@ -259,7 +305,7 @@
           </div>
           <div class="d-flex align-items-baseline gap-1">
             <span id="cardTemp" class="display-6 fw-bold">--</span>
-            <span class="text-secondary small">°C</span>
+            <span id="cardTempUnit" class="text-secondary small">°C</span>
           </div>
           <div class="sparkline-box my-1"><canvas id="sparkTemp"></canvas></div>
           <span class="text-muted" style="font-size: 0.72rem;">Ambient Monitored</span>
@@ -421,7 +467,7 @@
         <span class="badge bg-primary">PDF</span>
       </button>
 
-      <a id="linkDownloadCsv" href="/api/download-csv?node_id=lucknow_tank_01" class="btn btn-outline-secondary btn-sm d-flex justify-content-between align-items-center">
+      <a id="linkDownloadCsv" href="/api/download-csv?node_id=lucknow_tank_1" class="btn btn-outline-secondary btn-sm d-flex justify-content-between align-items-center">
         <span id="txtMenuCsv"><i class="bi bi-download me-2"></i>Download Raw CSV</span>
         <span id="txtMenuCsvBadge" class="badge bg-secondary">CSV</span>
       </a>

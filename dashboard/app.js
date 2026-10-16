@@ -13,7 +13,7 @@ let recordsModal = null;
 let gisModal = null;
 
 // -------------------------------------------------------------
-// 1. Safe Modal Initializer (Guards against missing DOM nodes)
+// 1. Safe Modal Initializer
 // -------------------------------------------------------------
 function safeInitModal(id) {
   const el = document.getElementById(id);
@@ -129,7 +129,7 @@ function toggleTheme() {
     label.className = isDark ? 'badge bg-success' : 'badge bg-secondary';
   }
 
-  const textColor = isDark ? '#cbd5e1' : '#64748b';
+  const textColor = isDark ? '#f8fafc' : '#64748b';
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
 
   [wqiTrendChart, lineComparisonChart, statusPieChart].forEach(chart => {
@@ -485,10 +485,24 @@ const wqiTrendChart = new Chart(ctxWqi, {
   options: {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 8, font: { size: 10 } } } },
+    plugins: { 
+      legend: { 
+        position: 'top', 
+        labels: { boxWidth: 12, padding: 8, font: { size: 10 }, color: '#94a3b8' } 
+      } 
+    },
     scales: {
-      y: { min: 0, max: 120, title: { display: true, text: 'Index', font: { size: 10 } }, ticks: { stepSize: 20, font: { size: 9 } } },
-      x: { ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 6, font: { size: 8 } } }
+      y: { 
+        min: 0, 
+        max: 120, 
+        title: { display: true, text: 'Index', font: { size: 10 }, color: '#94a3b8' }, 
+        ticks: { stepSize: 20, font: { size: 9 }, color: '#94a3b8' },
+        grid: { color: 'rgba(255, 255, 255, 0.08)' }
+      },
+      x: { 
+        ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 6, font: { size: 8 }, color: '#94a3b8' },
+        grid: { color: 'rgba(255, 255, 255, 0.08)' }
+      }
     }
   }
 });
@@ -510,11 +524,35 @@ const lineComparisonChart = new Chart(ctxLine, {
     responsive: true,
     maintainAspectRatio: false,
     interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { position: 'top', labels: { boxWidth: 10, padding: 6, font: { size: 9 } } } },
+    plugins: { 
+      legend: { 
+        position: 'top', 
+        labels: { boxWidth: 10, padding: 6, font: { size: 9 }, color: '#94a3b8' } 
+      } 
+    },
     scales: {
-      y: { type: 'linear', display: true, position: 'left', ticks: { font: { size: 9 } }, suggestedMin: 0, suggestedMax: 600 },
-      y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { font: { size: 9 } }, suggestedMin: 0, suggestedMax: 25 },
-      x: { ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 6, font: { size: 8 } } }
+      y: { 
+        type: 'linear', 
+        display: true, 
+        position: 'left', 
+        ticks: { font: { size: 9 }, color: '#94a3b8' }, 
+        grid: { color: 'rgba(255, 255, 255, 0.08)' },
+        suggestedMin: 0, 
+        suggestedMax: 600 
+      },
+      y1: { 
+        type: 'linear', 
+        display: true, 
+        position: 'right', 
+        grid: { drawOnChartArea: false }, 
+        ticks: { font: { size: 9 }, color: '#94a3b8' }, 
+        suggestedMin: 0, 
+        suggestedMax: 25 
+      },
+      x: { 
+        ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 6, font: { size: 8 }, color: '#94a3b8' },
+        grid: { color: 'rgba(255, 255, 255, 0.08)' }
+      }
     }
   }
 });
@@ -539,14 +577,14 @@ const statusPieChart = new Chart(ctxPie, {
     plugins: {
       legend: {
         position: 'bottom',
-        labels: { boxWidth: 12, padding: 8, font: { size: 10 } }
+        labels: { boxWidth: 12, padding: 8, font: { size: 10 }, color: '#94a3b8' }
       }
     }
   }
 });
 
 // -------------------------------------------------------------
-// 6. Metric Modal & PDF Audit Export
+// 6. Metric Modal & PDF Compliance Export
 // -------------------------------------------------------------
 function openMetricModal(metricKey) {
   if (!rawTelemetryHistory || rawTelemetryHistory.length === 0) return;
@@ -679,7 +717,7 @@ function openMetricModal(metricKey) {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 600 },
-      scales: { x: { ticks: { maxRotation: 45, minRotation: 45, maxTicksLimit: 8 } } }
+      scales: { x: { ticks: { maxRotation: 45, minRotation: 45, maxTicksLimit: 8, color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } }
     }
   });
 
