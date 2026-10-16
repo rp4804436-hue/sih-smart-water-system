@@ -8,54 +8,29 @@ let agricultureCount = 0;
 let unusableCount = 0;
 
 let modalChartInstance = null;
-const detailModal = new bootstrap.Modal(document.getElementById('metricDetailModal'));
-const diagnosticsModal = new bootstrap.Modal(document.getElementById('diagnosticsModal'));
-const recordsModal = new bootstrap.Modal(document.getElementById('recordsModal'));
-const gisModal = new bootstrap.Modal(document.getElementById('gisModal'));
-const roiModal = new bootstrap.Modal(document.getElementById('roiModal'));
+let detailModal = null;
+let recordsModal = null;
+let gisModal = null;
 
 // -------------------------------------------------------------
-// 1. Hydraulic Flow Pipe Animation Engine
+// 1. Safe Modal Initializer (Guards against missing DOM nodes)
 // -------------------------------------------------------------
-function ensurePipeFlowStyles() {
-  if (document.getElementById('pipe-flow-dynamic-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'pipe-flow-dynamic-styles';
-  style.innerHTML = `
-    @keyframes fluidFlowMotion {
-      0% { stroke-dashoffset: 60; }
-      100% { stroke-dashoffset: 0; }
-    }
-    .pipe-fluid {
-      stroke-dasharray: 10, 8;
-      animation: fluidFlowMotion 1.2s linear infinite;
-      transition: stroke 0.4s ease, filter 0.4s ease;
-    }
-    .flow-cyan {
-      stroke: #06b6d4 !important;
-      filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.65));
-    }
-    .flow-amber {
-      stroke: #f59e0b !important;
-      filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.65));
-    }
-    .flow-red {
-      stroke: #ef4444 !important;
-      filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.65));
-    }
-  `;
-  document.head.appendChild(style);
+function safeInitModal(id) {
+  const el = document.getElementById(id);
+  if (el && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    return new bootstrap.Modal(el);
+  }
+  return null;
 }
-ensurePipeFlowStyles();
 
 // -------------------------------------------------------------
-// 2. Lucknow Tank Multi-Node Registry
+// 2. Multi-Node Registry (Lucknow Tank-1 through Tank-4)
 // -------------------------------------------------------------
 const clusterNodes = [
-  { id: 0, node_key: "lucknow_tank_1", name: "Lucknow Tank-1", lat: 26.8520, lng: 80.9400, status: "High Iron / Silt Inflow", color: "#ef4444" },
-  { id: 1, node_key: "lucknow_tank_2", name: "Lucknow Tank-2", lat: 26.8680, lng: 80.9620, status: "Moderate Acidity / Turbid", color: "#f59e0b" },
-  { id: 2, node_key: "lucknow_tank_3", name: "Lucknow Tank-3", lat: 26.8320, lng: 80.9280, status: "Elevated TDS & Mineral Load", color: "#f59e0b" },
-  { id: 3, node_key: "lucknow_tank_4", name: "Lucknow Tank-4", lat: 26.8450, lng: 80.9580, status: "IS 10500 Potable", color: "#10b981" }
+  { id: 0, node_key: "lucknow_tank_1", name: "Lucknow (Main Tank-1)", lat: 26.8520, lng: 80.9400, status: "High Iron / Silt Inflow", color: "#ef4444" },
+  { id: 1, node_key: "lucknow_tank_2", name: "Lucknow (Main Tank-2)", lat: 26.8680, lng: 80.9620, status: "Moderate Acidity / Turbid", color: "#f59e0b" },
+  { id: 2, node_key: "lucknow_tank_3", name: "Lucknow (Main Tank-3)", lat: 26.8320, lng: 80.9280, status: "Elevated TDS & Mineral Load", color: "#f59e0b" },
+  { id: 3, node_key: "lucknow_tank_4", name: "Lucknow (Main Tank-4)", lat: 26.8450, lng: 80.9580, status: "IS 10500 Potable", color: "#10b981" }
 ];
 
 let selectedNodeIndex = 0;
@@ -64,6 +39,9 @@ const markers = [];
 
 function initMap() {
   if (map) return;
+  const mapContainer = document.getElementById('gisMap');
+  if (!mapContainer) return;
+
   map = L.map('gisMap', { zoomControl: true }).setView([26.85, 80.95], 12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
@@ -86,11 +64,14 @@ function initMap() {
 }
 
 function openGisModal() {
-  gisModal.show();
+  if (!gisModal) gisModal = safeInitModal('gisModal');
+  if (gisModal) gisModal.show();
   setTimeout(() => {
     initMap();
-    map.invalidateSize();
-    map.panTo([clusterNodes[selectedNodeIndex].lat, clusterNodes[selectedNodeIndex].lng]);
+    if (map) {
+      map.invalidateSize();
+      map.panTo([clusterNodes[selectedNodeIndex].lat, clusterNodes[selectedNodeIndex].lng]);
+    }
   }, 300);
 }
 
@@ -100,9 +81,6 @@ function selectClusterNode(index) {
   
   const selectMenu = document.getElementById('nodeSelectMenu');
   if (selectMenu) selectMenu.value = selectedNodeIndex;
-  
-  const activeLabel = document.getElementById('txtGisActiveNode');
-  if (activeLabel) activeLabel.innerText = `Active: ${node.name}`;
 
   const recordsSub = document.getElementById('txtRecordsSubtitle');
   if (recordsSub) recordsSub.innerText = `Telemetry ingested at 3-second intervals | Station: ${node.name}`;
@@ -111,9 +89,9 @@ function selectClusterNode(index) {
     const pill = document.getElementById(`pillNode${i}`);
     if (pill) {
       if (i === selectedNodeIndex) {
-        pill.className = "btn btn-sm btn-primary text-nowrap py-1 px-2.5 rounded-pill shadow-xs";
+        pill.className = "btn btn-sm btn-primary text-nowrap py-1 px-3 rounded-pill shadow-xs";
       } else {
-        pill.className = "btn btn-sm btn-outline-secondary text-nowrap py-1 px-2.5 rounded-pill shadow-xs";
+        pill.className = "btn btn-sm btn-outline-secondary text-nowrap py-1 px-3 rounded-pill shadow-xs";
       }
     }
   }
@@ -127,16 +105,20 @@ function selectClusterNode(index) {
   }
 
   [sparkWqi, sparkIron, sparkPh, sparkTurb, sparkTds, sparkTemp].forEach(s => {
-    s.data.labels = [];
-    s.data.datasets[0].data = [];
-    s.update();
+    if (s && s.data) {
+      s.data.labels = [];
+      s.data.datasets[0].data = [];
+      s.update();
+    }
   });
 
   fetchLiveTelemetry();
 }
 
-function openRecordsModal() { recordsModal.show(); }
-function openDiagnosticsModal() { diagnosticsModal.show(); }
+function openRecordsModal() {
+  if (!recordsModal) recordsModal = safeInitModal('recordsModal');
+  if (recordsModal) recordsModal.show();
+}
 
 function toggleTheme() {
   document.body.classList.toggle('dark-mode');
@@ -177,13 +159,13 @@ function dispatchWhatsAppAlert() {
   const node = clusterNodes[selectedNodeIndex].name;
   
   const msg = encodeURIComponent(
-    `🚨 *JALDRISHTI WATER CONTAMINATION ADVISORY*\n` +
+    `🚨 *JALDRISHTI WATER ADVISORY*\n` +
     `📍 Installation: ${node}\n` +
     `📊 WQI Score: ${wqi}/100\n` +
     `🧪 Dissolved Fe: ${Number(latest.Iron_mgL).toFixed(2)} mg/L (Limit: 0.30)\n` +
     `🌡️ pH: ${Number(latest.pH).toFixed(2)} | Turbidity: ${Number(latest.Turbidity_NTU).toFixed(1)} NTU\n` +
     `⚠️ Status: ${latest.Status === 'Safe' ? 'Drinking Safe (पेयजल योग्य)' : 'CONTAMINATED - DO NOT DRINK (असुरक्षित जल)'}\n` +
-    `ℹ️ Auto-Dispatched via JalDrishti Rural Edge Node.`
+    `ℹ️ Auto-Dispatched via JalDrishti Edge Node.`
   );
 
   window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
@@ -198,7 +180,7 @@ const i18n = {
     schematicHeader: "Closed-Loop Hydraulic Remediation & Storage Stream",
     node1: "Borewell Intake",
     node2: "Greensand Bed",
-    node2Sub: "Fe Stripping",
+    node2Sub: "(Fe Stripping)",
     node3: "Sensing Cell",
     node4: "UV-C Disinfection",
     pipeInlet: "Inlet Raw Groundwater",
@@ -220,58 +202,46 @@ const i18n = {
     proxyMnLimit: "Limit: 0.10 mg/L",
     proxySo4Label: "Est. Sulfate (SO₄²⁻)",
     proxySo4Limit: "Limit: 200 mg/L",
-    filterHeader: "Predictive Filter & Consumable Life",
-    filterBed: "Greensand & Activated Carbon Bed",
-    filterUv: "Inline UV-C Disinfection Lamp",
     healthHeader: "Predictive Habitation Health Risk & Pathogen Warning",
     toxicRiskTitle: "Heavy Metal Exposure",
     pathogenRiskTitle: "Gastrointestinal Risk",
-    roiHeader: "Unit Economics & Habitation ROI",
-    costPerLitre: "Purification Cost",
-    tankerBenchmark: "Commercial Tanker",
-    netSavings: "Net Savings",
     trendHeader: "Water Quality Index (WQI) vs Time",
     trendSub: "Longitudinal quality trend derived via IS 10500 standards",
     traceHeader: "Live Parameter Traces vs Standards",
     donutHeader: "Water Usability Ratio",
-    drinkable: "Drinkable / Household",
-    agriculture: "Agriculture / Irrigation",
-    unusable: "Unusable / Raw Discharge",
-    menuClusterTitle: "Active Lucknow Tank Node",
+    drinkable: "Drinkable (Household)",
+    agriculture: "Agriculture Purpose",
+    unusable: "Unusable (Undrinkable)",
+    menuClusterTitle: "Active Jal Nigam Tank Node",
     menuOpsHeader: "Operations & Preferences",
-    menuLangTitle: "Language (भाषा)",
+    menuLangTitle: "Language",
     menuVoiceTitle: "Panchayat IVRS Voice",
-    menuVoiceSub: "Broadcast audio water advisory",
     menuVoiceBadge: "Broadcast",
-    menuRoiTitle: "Unit Economics & ROI",
-    menuRoiSub: "Treatment vs tanker cost metrics",
     menuRecords: "Operational Records Log",
-    menuViewTable: "View Table",
+    menuViewTable: "View",
     menuDarkMode: "Dark Mode",
     menuPdf: "Export Audit PDF",
     menuCsv: "Download Raw CSV",
-    menuCsvBadge: "Records",
-    menuGis: "GIS Tank Grid",
+    menuCsvBadge: "CSV",
+    menuGis: "GIS Habitation Tank Grid",
     menuGisBadge: "Map",
-    menuDiag: "Sensor Diagnostics",
-    menuDiagBadge: "Hardware",
-    menuWa: "Alert Panchayat (WhatsApp)",
-    menuWaBadge: "Broadcast",
+    menuWa: "Alert Panchayat",
+    menuWaBadge: "WhatsApp",
     modalIngestedLabel: "Live Ingested Value",
     modalStandardLabel: "Standard Threshold",
     modalWaveform: "High-Resolution Temporal Waveform",
     modalCloseBtn: "Close",
-    optNode0: "Lucknow Tank-1",
-    optNode1: "Lucknow Tank-2",
-    optNode2: "Lucknow Tank-3",
-    optNode3: "Lucknow Tank-4"
+    optNode0: "Lucknow (Main Tank-1)",
+    optNode1: "Lucknow (Main Tank-2)",
+    optNode2: "Lucknow (Main Tank-3)",
+    optNode3: "Lucknow (Main Tank-4)"
   },
   HI: {
     headerSub: "ग्रामीण जल निगम टंकी टेलीमेट्री एवं स्वचालित शुद्धिकरण एज नोड",
     schematicHeader: "स्वचालित जल शुद्धिकरण एवं टंकी वितरण प्रणाली",
     node1: "बोरवेल अंतर्वाह",
     node2: "ग्रीनसैंड बेड",
-    node2Sub: "आयरन निष्कासन",
+    node2Sub: "(आयरन निष्कासन)",
     node3: "सेंसर कक्ष",
     node4: "यूवी-सी शोधन",
     pipeInlet: "कच्चा भूजल अंतर्वाह",
@@ -279,10 +249,10 @@ const i18n = {
     pipeOutlet: "शुद्ध सुरक्षित टंकी जल निकासी",
     wqiTitle: "जल गुणवत्ता सूचकांक (WQI)",
     hpiTitle: "भारी धातु प्रदूषण सूचकांक (HPI)",
-    iron: "घुलित लोहा (Fe)",
-    ph: "पीएच स्तर (pH)",
-    turb: "गंदलापन (Turbidity)",
-    tds: "टीडीएस स्तर (TDS)",
+    iron: "घुलित लोहा",
+    ph: "पीएच स्तर",
+    turb: "गंदलापन",
+    tds: "टीडीएस स्तर",
     temp: "तापमान",
     active: "सक्रिय",
     limeCardTitle: "जल उदासीनीकरण (चूना खुराक)",
@@ -293,51 +263,39 @@ const i18n = {
     proxyMnLimit: "सीमा: 0.10 मिग्रा/ली",
     proxySo4Label: "अनुमानित सल्फेट (SO₄²⁻)",
     proxySo4Limit: "सीमा: 200 मिग्रा/ली",
-    filterHeader: "फ़िल्टर आयु एवं पूर्वानुमान",
-    filterBed: "ग्रीनसैंड व चारकोल बेड",
-    filterUv: "यूवी-सी कीटाणुशोधन लैंप",
     healthHeader: "संभावित ग्रामीण स्वास्थ्य जोखिम एवं महामारी चेतावनी",
     toxicRiskTitle: "भारी धातु जोखिम",
     pathogenRiskTitle: "उदर/संक्रमण रोग जोखिम",
-    roiHeader: "इकाई लागत एवं समुदाय बचत (ROI)",
-    costPerLitre: "शुद्धिकरण लागत",
-    tankerBenchmark: "टैंकर जल मानक",
-    netSavings: "कुल शुद्ध बचत",
     trendHeader: "जल गुणवत्ता सूचकांक (समय अनुसार)",
     trendSub: "IS 10500 मानकों पर आधारित प्रवृत्तियां",
     traceHeader: "लाइव मापदंड एवं मानक सीमा",
     donutHeader: "जल उपयोगिता अनुपात",
-    drinkable: "पीने योग्य / घरेलू उपयोग",
-    agriculture: "कृषि सिंचाई हेतु",
-    unusable: "दूषित / अनुपयोगी",
-    menuClusterTitle: "सक्रिय लखनऊ टंकी नोड",
+    drinkable: "पीने योग्य (घरेलू)",
+    agriculture: "कृषि उपयोग",
+    unusable: "अनुपयोगी (अपेय)",
+    menuClusterTitle: "सक्रिय जल निगम टंकी नोड",
     menuOpsHeader: "संचालन एवं प्राथमिकताएं",
-    menuLangTitle: "भाषा (Language)",
+    menuLangTitle: "भाषा",
     menuVoiceTitle: "ग्राम पंचायत IVRS ध्वनि संदेश",
-    menuVoiceSub: "ऑडियो जल गुणवत्ता परामर्श प्रसारित करें",
     menuVoiceBadge: "प्रसारित करें",
-    menuRoiTitle: "इकाई लागत एवं बचत (ROI)",
-    menuRoiSub: "शुद्धिकरण बनाम टैंकर आपूर्ति लागत",
     menuRecords: "परिचालन रिकॉर्ड लॉग",
-    menuViewTable: "तालिका देखें",
+    menuViewTable: "देखें",
     menuDarkMode: "डार्क मोड",
     menuPdf: "ऑडिट PDF डाउनलोड",
     menuCsv: "रॉ CSV डाउनलोड करें",
-    menuCsvBadge: "रिकॉर्ड्स",
+    menuCsvBadge: "CSV",
     menuGis: "GIS ग्रामीण टंकी ग्रिड",
     menuGisBadge: "मानचित्र",
-    menuDiag: "सेंसर निदान एवं स्थिति",
-    menuDiagBadge: "हार्डवेयर",
-    menuWa: "ग्राम पंचायत को सूचित करें (WhatsApp)",
-    menuWaBadge: "अलर्ट भेजें",
+    menuWa: "ग्राम पंचायत को सूचित करें",
+    menuWaBadge: "WhatsApp",
     modalIngestedLabel: "लाइव मापा गया मान",
     modalStandardLabel: "मानक सुरक्षा सीमा",
     modalWaveform: "उच्च-रिज़ॉल्यूशन समय तरंग (Waveform)",
     modalCloseBtn: "बंद करें",
-    optNode0: "लखनऊ टैंक-1 (Lucknow Tank-1)",
-    optNode1: "लखनऊ टैंक-2 (Lucknow Tank-2)",
-    optNode2: "लखनऊ टैंक-3 (Lucknow Tank-3)",
-    optNode3: "लखनऊ टैंक-4 (Lucknow Tank-4)"
+    optNode0: "लखनऊ (मुख्य टैंक-1)",
+    optNode1: "लखनऊ (मुख्य टैंक-2)",
+    optNode2: "लखनऊ (मुख्य टैंक-3)",
+    optNode3: "लखनऊ (मुख्य टैंक-4)"
   }
 };
 
@@ -351,12 +309,11 @@ function toggleLanguage() {
   const t = i18n[currentLanguage];
 
   const menuBadge = document.getElementById('langMenuBadge');
-  if (menuBadge) {
-    menuBadge.innerText = currentLanguage === 'EN' ? 'English' : 'हिन्दी';
-    menuBadge.className = currentLanguage === 'EN' ? 'badge bg-primary' : 'badge bg-warning text-dark';
-  }
+  if (menuBadge) menuBadge.innerText = currentLanguage === 'EN' ? 'Language' : 'भाषा';
 
-  // Header & Pipe Flow
+  const menuBadgeDrawer = document.getElementById('langMenuBadgeDrawer');
+  if (menuBadgeDrawer) menuBadgeDrawer.innerText = currentLanguage;
+
   setSafeText('txtHeaderSubtitle', t.headerSub);
   setSafeText('txtSchematicHeader', t.schematicHeader);
   setSafeText('txtNode1', t.node1);
@@ -368,7 +325,6 @@ function toggleLanguage() {
   setSafeText('txtPipeMid', t.pipeMid);
   setSafeText('txtPipeOutlet', t.pipeOutlet);
 
-  // Cards
   setSafeText('cardCompositeTitle', isHpiMode ? t.hpiTitle : t.wqiTitle);
   setSafeText('txtCardIron', t.iron);
   setSafeText('txtCardPh', t.ph);
@@ -377,7 +333,6 @@ function toggleLanguage() {
   setSafeText('txtCardTemp', t.temp);
   setSafeText('txtCardTempActive', t.active);
 
-  // Smart Feature Cards
   setSafeText('txtLimeCardTitle', t.limeCardTitle);
   setSafeText('txtLimeUnit', t.limeUnit);
   setSafeText('txtProxyTitle', t.proxyTitle);
@@ -387,33 +342,20 @@ function toggleLanguage() {
   setSafeText('txtProxySo4Label', t.proxySo4Label);
   setSafeText('txtProxySo4Limit', t.proxySo4Limit);
 
-  // ROI, Filter & Risk Modules
-  setSafeText('txtRoiHeader', t.roiHeader);
-  setSafeText('txtCostPerLitre', t.costPerLitre);
-  setSafeText('txtTankerBenchmark', t.tankerBenchmark);
-  setSafeText('txtNetSavings', t.netSavings);
-  setSafeText('txtFilterHeader', t.filterHeader);
-  setSafeText('txtFilterBed', t.filterBed);
-  setSafeText('txtFilterUv', t.filterUv);
   setSafeText('txtHealthHeader', t.healthHeader);
   setSafeText('txtToxicRiskTitle', t.toxicRiskTitle);
   setSafeText('txtPathogenRiskTitle', t.pathogenRiskTitle);
 
-  // Analytics Titles
   setSafeText('txtTrendHeader', t.trendHeader);
   setSafeText('txtTrendSubtitle', t.trendSub);
   setSafeText('txtTraceHeader', t.traceHeader);
   setSafeText('txtDonutHeader', t.donutHeader);
 
-  // Offcanvas Menu Drawer Elements
   setSafeText('txtMenuClusterTitle', t.menuClusterTitle);
   setSafeText('txtMenuOpsHeader', t.menuOpsHeader);
   setSafeText('txtMenuLangTitle', t.menuLangTitle);
   setSafeText('txtMenuVoiceTitle', t.menuVoiceTitle);
-  setSafeText('txtMenuVoiceSub', t.menuVoiceSub);
   setSafeText('menuVoiceBadge', t.menuVoiceBadge);
-  setSafeText('txtMenuRoiTitle', t.menuRoiTitle);
-  setSafeText('txtMenuRoiSub', t.menuRoiSub);
   setSafeText('txtMenuRecords', t.menuRecords);
   setSafeText('txtMenuViewTable', t.menuViewTable);
   setSafeText('txtMenuDarkMode', t.menuDarkMode);
@@ -421,27 +363,24 @@ function toggleLanguage() {
   setSafeText('txtMenuCsv', t.menuCsv);
   setSafeText('txtMenuCsvBadge', t.menuCsvBadge);
   setSafeText('txtMenuGis', t.menuGis);
-  setSafeText('txtMenuGisBadge', t.menuGisBadge);
-  setSafeText('txtMenuDiag', t.menuDiag);
-  setSafeText('txtMenuDiagBadge', t.menuDiagBadge);
+  setSafeText('menuGisBadge', t.menuGisBadge);
   setSafeText('txtMenuWa', t.menuWa);
-  setSafeText('txtMenuWaBadge', t.menuWaBadge);
+  setSafeText('menuWaBadge', t.menuWaBadge);
 
-  // Dropdown Options
   setSafeText('optNode0', t.optNode0);
   setSafeText('optNode1', t.optNode1);
   setSafeText('optNode2', t.optNode2);
   setSafeText('optNode3', t.optNode3);
 
-  // Modal Text
   setSafeText('txtModalIngestedLabel', t.modalIngestedLabel);
   setSafeText('txtModalStandardLabel', t.modalStandardLabel);
   setSafeText('txtModalWaveform', t.modalWaveform);
   setSafeText('txtModalCloseBtn', t.modalCloseBtn);
 
-  // Chart Labels
-  statusPieChart.data.labels = [t.drinkable, t.agriculture, t.unusable];
-  statusPieChart.update();
+  if (statusPieChart) {
+    statusPieChart.data.labels = [t.drinkable, t.agriculture, t.unusable];
+    statusPieChart.update();
+  }
 
   fetchLiveTelemetry();
 }
@@ -458,12 +397,12 @@ function toggleHpiMode() {
     if (title) title.innerText = t.hpiTitle;
     if (unit) unit.innerText = " HPI";
     if (benchmark) benchmark.innerText = "≤ 100 Permissible";
-    if (badge) badge.innerText = currentLanguage === 'HI' ? "WQI पर स्विच करें" : "Switch to WQI";
+    if (badge) badge.innerText = "WQI";
   } else {
     if (title) title.innerText = t.wqiTitle;
     if (unit) unit.innerText = "/100";
     if (benchmark) benchmark.innerText = "≥ 70 Safe";
-    if (badge) badge.innerText = currentLanguage === 'HI' ? "HPI पर स्विच करें" : "Switch to HPI";
+    if (badge) badge.innerText = "HPI";
   }
   fetchLiveTelemetry();
 }
@@ -478,7 +417,9 @@ function computeHpi(fe, tds) {
 // 4. Sparkline Factory
 // -------------------------------------------------------------
 function createSparkline(canvasId, strokeColor, fillColor) {
-  const ctx = document.getElementById(canvasId).getContext('2d');
+  const el = document.getElementById(canvasId);
+  if (!el) return null;
+  const ctx = el.getContext('2d');
   return new Chart(ctx, {
     type: 'line',
     data: {
@@ -520,7 +461,7 @@ const wqiTrendChart = new Chart(ctxWqi, {
     labels: [],
     datasets: [
       {
-        label: 'Water Metric Score',
+        label: 'Score',
         data: [],
         borderColor: '#0284c7',
         backgroundColor: 'rgba(2, 132, 199, 0.12)',
@@ -531,7 +472,7 @@ const wqiTrendChart = new Chart(ctxWqi, {
         pointBackgroundColor: '#0284c7'
       },
       {
-        label: 'Safety Threshold',
+        label: 'Baseline',
         data: [],
         borderColor: '#10b981',
         borderDash: [5, 5],
@@ -546,7 +487,7 @@ const wqiTrendChart = new Chart(ctxWqi, {
     maintainAspectRatio: false,
     plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 8, font: { size: 10 } } } },
     scales: {
-      y: { min: 0, max: 120, title: { display: true, text: 'Index Value', font: { size: 10 } }, ticks: { stepSize: 20, font: { size: 9 } } },
+      y: { min: 0, max: 120, title: { display: true, text: 'Index', font: { size: 10 } }, ticks: { stepSize: 20, font: { size: 9 } } },
       x: { ticks: { maxRotation: 45, minRotation: 45, autoSkip: true, maxTicksLimit: 6, font: { size: 8 } } }
     }
   }
@@ -595,57 +536,17 @@ const statusPieChart = new Chart(ctxPie, {
   options: {
     responsive: true,
     maintainAspectRatio: false,
-    animation: { animateRotate: true, animateScale: true, duration: 600 },
     plugins: {
       legend: {
         position: 'bottom',
-        labels: { boxWidth: 12, padding: 8, font: { size: 10 } },
-        onClick: (e, legendItem) => { handleSliceZoom(legendItem.index); }
+        labels: { boxWidth: 12, padding: 8, font: { size: 10 } }
       }
-    },
-    onClick: (event, elements) => {
-      if (elements && elements.length > 0) handleSliceZoom(elements[0].index);
     }
   }
 });
 
-function handleSliceZoom(sliceIndex) {
-  const dataset = statusPieChart.data.datasets[0];
-  const total = dataset.data.reduce((a, b) => a + b, 0);
-
-  if (selectedPieSlice === sliceIndex) {
-    dataset.offset = [0, 0, 0];
-    selectedPieSlice = null;
-    const banner = document.getElementById('pieFocusBanner');
-    if (banner) banner.classList.add('d-none');
-  } else {
-    selectedPieSlice = sliceIndex;
-    dataset.offset = [0, 0, 0];
-    dataset.offset[sliceIndex] = 20;
-
-    const label = statusPieChart.data.labels[sliceIndex];
-    const val = dataset.data[sliceIndex];
-    const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-
-    const banner = document.getElementById('pieFocusBanner');
-    const bannerText = document.getElementById('pieFocusText');
-
-    let color = '#10b981';
-    if (sliceIndex === 1) color = '#f59e0b';
-    if (sliceIndex === 2) color = '#ef4444';
-
-    if (banner && bannerText) {
-      banner.className = `alert alert-light border text-center py-1 px-2 mb-2 shadow-sm`;
-      banner.style.borderLeft = `5px solid ${color}`;
-      bannerText.innerHTML = `<span style="color: ${color}; font-weight: bold;">${label}</span>: <strong>${val} ${currentLanguage === 'HI' ? 'लॉग' : 'logs'}</strong> (${pct}% ${currentLanguage === 'HI' ? 'कुल प्रवाह का' : 'of total run'})`;
-      banner.classList.remove('d-none');
-    }
-  }
-  statusPieChart.update();
-}
-
 // -------------------------------------------------------------
-// 6. Detailed Modals & PDF Compliance Export
+// 6. Metric Modal & PDF Audit Export
 // -------------------------------------------------------------
 function openMetricModal(metricKey) {
   if (!rawTelemetryHistory || rawTelemetryHistory.length === 0) return;
@@ -695,7 +596,7 @@ function openMetricModal(metricKey) {
     thresholdLine = 0.30;
   } else if (metricKey === 'ph') {
     title = isHindi ? "अम्लीयता / क्षारीयता (pH)" : "Acidity / Basicity (pH)";
-    subtitle = isHindi ? "एनालॉग ग्लास प्रोब द्वारा मापी गई हाइड्रोजन-आयन गतिविधि" : "Hydrogen-ion activity acquired via analog glass probe";
+    subtitle = isHindi ? "एनालॉग प्रोब द्वारा मापी गई हाइड्रोजन-आयन गतिविधि" : "Hydrogen-ion activity acquired via analog probe";
     valueStr = `${phVal.toFixed(2)}`;
     standardStr = isHindi ? "6.5 - 8.5 (तटस्थ सीमा)" : "6.5 - 8.5 (Neutral Range)";
     isCompliant = phVal >= 6.5 && phVal <= 8.5;
@@ -740,14 +641,9 @@ function openMetricModal(metricKey) {
   if (badge) {
     badge.className = isCompliant ? "badge bg-success mt-1" : "badge bg-danger mt-1";
     badge.innerText = isCompliant 
-      ? (isHindi ? "मानकों के अनुरूप (Compliant)" : "Compliant with Standards") 
+      ? (isHindi ? "मानकों के अनुरूप (Compliant)" : "Compliant") 
       : (isHindi ? "मानक सीमा से अधिक (Unsafe)" : "Exceeds Permissible Limit");
   }
-
-  setSafeText('txtModalIngestedLabel', isHindi ? "लाइव मापा गया मान" : "Live Ingested Value");
-  setSafeText('txtModalStandardLabel', isHindi ? "मानक सुरक्षा सीमा" : "Standard Threshold");
-  setSafeText('txtModalWaveform', isHindi ? "उच्च-रिज़ॉल्यूशन समय तरंग (Waveform)" : "High-Resolution Temporal Waveform");
-  setSafeText('txtModalCloseBtn', isHindi ? "बंद करें" : "Close");
 
   if (modalChartInstance) modalChartInstance.destroy();
 
@@ -782,12 +678,13 @@ function openMetricModal(metricKey) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 800, easing: 'easeOutQuart' },
+      animation: { duration: 600 },
       scales: { x: { ticks: { maxRotation: 45, minRotation: 45, maxTicksLimit: 8 } } }
     }
   });
 
-  detailModal.show();
+  if (!detailModal) detailModal = safeInitModal('metricDetailModal');
+  if (detailModal) detailModal.show();
 }
 
 function generateCompliancePDF() {
@@ -808,7 +705,7 @@ function generateCompliancePDF() {
 
   doc.setFontSize(9);
   doc.setTextColor(51, 65, 85);
-  doc.text("Regulatory Verification Standard: National Rural Drinking Water Program & IS 10500:2012", 14, 32);
+  doc.text("Regulatory Verification Standard: National Rural Drinking Water & IS 10500:2012", 14, 32);
   doc.text(`Installation: ${clusterNodes[selectedNodeIndex].name} | Generated: ${new Date().toLocaleString()}`, 14, 37);
 
   const totalLogs = rawTelemetryHistory.length;
@@ -844,11 +741,6 @@ function generateCompliancePDF() {
     styles: { fontSize: 8 }
   });
 
-  const finalY = doc.lastAutoTable.finalY + 14;
-  doc.setFontSize(8);
-  doc.setTextColor(100, 116, 139);
-  doc.text("Approved by: JalDrishti Automated Telemetry Ingestion Engine | Over-Head Tank (OHT) Node", 14, finalY);
-
   doc.save(`JalDrishti_Audit_${clusterNodes[selectedNodeIndex].node_key}_${Date.now()}.pdf`);
 }
 
@@ -870,7 +762,7 @@ function computeFallbackWqi(item) {
   const tds = Number(item.TDS_PPM || 0);
 
   const q_fe = fe <= 0.3 ? Math.max(0, 100 - (fe / 0.3) * 100) : Math.max(0, 50 - ((fe - 0.3) / 1.0) * 50);
-  const q_ph = Math.max(0, 100 - (abs(ph - 7.0) / 1.5) * 100);
+  const q_ph = Math.max(0, 100 - (Math.abs(ph - 7.0) / 1.5) * 100);
   const q_turb = turb <= 5.0 ? Math.max(0, 100 - (turb / 5.0) * 100) : Math.max(0, 50 - ((turb - 5.0) / 15.0) * 50);
   const q_tds = tds <= 500 ? Math.max(0, 100 - (tds / 500.0) * 100) : Math.max(0, 50 - ((tds - 500) / 500.0) * 50);
 
@@ -924,13 +816,13 @@ function updateWqiChart() {
     : (currentLanguage === 'HI' ? "WQI स्कोर" : "WQI Score");
   wqiTrendChart.data.datasets[1].data = thresholds;
   wqiTrendChart.data.datasets[1].label = isHpiMode 
-    ? (currentLanguage === 'HI' ? "HPI अधिकतम सीमा (100)" : "HPI Ceiling (100)") 
-    : (currentLanguage === 'HI' ? "WQI सुरक्षित आधार रेखा (70)" : "WQI Baseline (70)");
+    ? (currentLanguage === 'HI' ? "HPI सीमा (100)" : "HPI Ceiling (100)") 
+    : (currentLanguage === 'HI' ? "WQI आधार रेखा (70)" : "WQI Baseline (70)");
   wqiTrendChart.update();
 }
 
 // -------------------------------------------------------------
-// 7. Node-Routed Telemetry Ingestion Loop
+// 7. Live Telemetry Polling Loop
 // -------------------------------------------------------------
 async function fetchLiveTelemetry() {
   try {
@@ -961,7 +853,6 @@ async function fetchLiveTelemetry() {
 
       applyPeripheryThresholds({ wqi: calculatedWqi, iron: fe, ph: ph, turbidity: turb, tds: tds, temperature: temp });
 
-      // Stoichiometric Dosing
       const limeVal = latest.lime_dosing_g_m3 !== undefined ? latest.lime_dosing_g_m3 : 0.0;
       setSafeText('valLimeDosing', Number(limeVal).toFixed(1));
 
@@ -978,7 +869,6 @@ async function fetchLiveTelemetry() {
         }
       }
 
-      // Heavy Metal Proxies
       if (latest.proxies) {
         const elMn = document.getElementById('valProxyMn');
         const elSo4 = document.getElementById('valProxySo4');
@@ -998,7 +888,6 @@ async function fetchLiveTelemetry() {
 
       const classification = classifyWaterUsage(calculatedWqi, fe, ph, tds, turb);
 
-      // Epidemiological Health Risk Meter
       const toxicPct = Math.min(100, Math.round((fe / 5.0) * 100));
       const pathogenPct = Math.min(100, Math.round((turb / 15.0) * 100));
       
@@ -1013,7 +902,7 @@ async function fetchLiveTelemetry() {
         } else if (toxicPct > 30) {
           barToxic.className = "progress-bar bg-warning";
           txtToxic.className = "fw-bold text-warning";
-          txtToxic.innerText = isHindi ? "मध्यम अंतर्ग्रहण जोखिम" : "Moderate Ingestion Risk";
+          txtToxic.innerText = isHindi ? "मध्यम जोखिम" : "Moderate Risk";
         } else {
           barToxic.className = "progress-bar bg-success";
           txtToxic.className = "fw-bold text-success";
@@ -1028,7 +917,7 @@ async function fetchLiveTelemetry() {
         if (pathogenPct > 50) {
           barPathogen.className = "progress-bar bg-danger";
           txtPathogen.className = "fw-bold text-danger";
-          txtPathogen.innerText = isHindi ? "उच्च रोगजनक गंदलापन" : "High Pathogen Turbidity";
+          txtPathogen.innerText = isHindi ? "उच्च गंदलापन (रोगजनक खतरा)" : "High Pathogen Turbidity";
         } else {
           barPathogen.className = "progress-bar bg-success";
           txtPathogen.className = "fw-bold text-success";
@@ -1047,7 +936,7 @@ async function fetchLiveTelemetry() {
         }
       }
 
-      // Hydraulic Fluid Line Flow with Restored SVG Animation
+      // Hydraulic Fluid Line Flow
       const fluidTube = document.getElementById('activeFlowFluid');
       const outletState = document.getElementById('flowOutletState');
 
@@ -1056,17 +945,17 @@ async function fetchLiveTelemetry() {
           banner.className = "alert alert-success d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
           outletState.className = "badge bg-success mt-1";
           outletState.innerText = isHindi ? "पीने योग्य" : "Potable";
-          fluidTube.setAttribute('class', 'pipe-fluid flow-cyan');
+          fluidTube.className = "pipe-fluid flow-cyan";
         } else if (classification.tier === 'Agriculture') {
           banner.className = "alert alert-warning d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
           outletState.className = "badge bg-warning text-dark mt-1";
           outletState.innerText = isHindi ? "सिंचाई योग्य" : "Irrigation";
-          fluidTube.setAttribute('class', 'pipe-fluid flow-amber');
+          fluidTube.className = "pipe-fluid flow-amber";
         } else {
           banner.className = "alert alert-danger d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3";
           outletState.className = "badge bg-danger mt-1";
           outletState.innerText = isHindi ? "अनुपयोगी" : "Unusable";
-          fluidTube.setAttribute('class', 'pipe-fluid flow-red');
+          fluidTube.className = "pipe-fluid flow-red";
         }
       }
       
@@ -1139,35 +1028,45 @@ async function fetchLiveTelemetry() {
       const tableBody = document.getElementById('dataTableBody');
       if (tableBody) tableBody.innerHTML = tableRows;
 
-      // Sparklines update
       const sliceCount = -15;
-      sparkWqi.data.labels = sparkWqiData.slice(sliceCount).map(() => '');
-      sparkWqi.data.datasets[0].data = isHpiMode 
-        ? sparkFeData.slice(sliceCount).map((fe, i) => computeHpi(fe, sparkTdsData.slice(sliceCount)[i]))
-        : sparkWqiData.slice(sliceCount);
-      sparkWqi.update();
+      if (sparkWqi) {
+        sparkWqi.data.labels = sparkWqiData.slice(sliceCount).map(() => '');
+        sparkWqi.data.datasets[0].data = isHpiMode 
+          ? sparkFeData.slice(sliceCount).map((fe, i) => computeHpi(fe, sparkTdsData.slice(sliceCount)[i]))
+          : sparkWqiData.slice(sliceCount);
+        sparkWqi.update();
+      }
 
-      sparkIron.data.labels = sparkFeData.slice(sliceCount).map(() => '');
-      sparkIron.data.datasets[0].data = sparkFeData.slice(sliceCount);
-      sparkIron.update();
+      if (sparkIron) {
+        sparkIron.data.labels = sparkFeData.slice(sliceCount).map(() => '');
+        sparkIron.data.datasets[0].data = sparkFeData.slice(sliceCount);
+        sparkIron.update();
+      }
 
-      sparkPh.data.labels = sparkPhData.slice(sliceCount).map(() => '');
-      sparkPh.data.datasets[0].data = sparkPhData.slice(sliceCount);
-      sparkPh.update();
+      if (sparkPh) {
+        sparkPh.data.labels = sparkPhData.slice(sliceCount).map(() => '');
+        sparkPh.data.datasets[0].data = sparkPhData.slice(sliceCount);
+        sparkPh.update();
+      }
 
-      sparkTurb.data.labels = sparkTurbData.slice(sliceCount).map(() => '');
-      sparkTurb.data.datasets[0].data = sparkTurbData.slice(sliceCount);
-      sparkTurb.update();
+      if (sparkTurb) {
+        sparkTurb.data.labels = sparkTurbData.slice(sliceCount).map(() => '');
+        sparkTurb.data.datasets[0].data = sparkTurbData.slice(sliceCount);
+        sparkTurb.update();
+      }
 
-      sparkTds.data.labels = sparkTdsData.slice(sliceCount).map(() => '');
-      sparkTds.data.datasets[0].data = sparkTdsData.slice(sliceCount);
-      sparkTds.update();
+      if (sparkTds) {
+        sparkTds.data.labels = sparkTdsData.slice(sliceCount).map(() => '');
+        sparkTds.data.datasets[0].data = sparkTdsData.slice(sliceCount);
+        sparkTds.update();
+      }
 
-      sparkTemp.data.labels = sparkTempData.slice(sliceCount).map(() => '');
-      sparkTemp.data.datasets[0].data = sparkTempData.slice(sliceCount);
-      sparkTemp.update();
+      if (sparkTemp) {
+        sparkTemp.data.labels = sparkTempData.slice(sliceCount).map(() => '');
+        sparkTemp.data.datasets[0].data = sparkTempData.slice(sliceCount);
+        sparkTemp.update();
+      }
 
-      // Comparison Chart update
       lineComparisonChart.data.labels = labels.slice(-25);
       lineComparisonChart.data.datasets[0].data = tdsCurrent.slice(-25);
       lineComparisonChart.data.datasets[1].data = tdsTarget.slice(-25);
@@ -1176,7 +1075,6 @@ async function fetchLiveTelemetry() {
       lineComparisonChart.data.datasets[4].data = ironCurrent.slice(-25);
       lineComparisonChart.update();
 
-      // Doughnut update
       statusPieChart.data.datasets[0].data = [drinkableCount, agricultureCount, unusableCount];
       statusPieChart.update();
 
@@ -1262,7 +1160,7 @@ function applyPeripheryThresholds(data) {
 }
 
 // -------------------------------------------------------------
-// 8. Interactive Voice / IVRS Broadcast
+// 8. Voice & IVRS Advisory
 // -------------------------------------------------------------
 function playPanchayatVoiceAdvisory() {
   if (!('speechSynthesis' in window)) {
@@ -1302,18 +1200,6 @@ function playPanchayatVoiceAdvisory() {
   window.speechSynthesis.speak(utterance);
 }
 
-// -------------------------------------------------------------
-// 9. Drawer Menu Triggers
-// -------------------------------------------------------------
-function openRoiModal() {
-  const drawerEl = document.getElementById('appMenuOffcanvas');
-  if (drawerEl) {
-    const bsOffcanvas = bootstrap.Offcanvas.getInstance(drawerEl);
-    if (bsOffcanvas) bsOffcanvas.hide();
-  }
-  roiModal.show();
-}
-
 function triggerMenuVoiceAdvisory() {
   const badge = document.getElementById('menuVoiceBadge');
   if (badge) {
@@ -1327,6 +1213,14 @@ function triggerMenuVoiceAdvisory() {
   playPanchayatVoiceAdvisory();
 }
 
-// Polling kick-off
-setInterval(fetchLiveTelemetry, 3000);
-fetchLiveTelemetry();
+// -------------------------------------------------------------
+// 9. Startup Execution
+// -------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  detailModal = safeInitModal('metricDetailModal');
+  recordsModal = safeInitModal('recordsModal');
+  gisModal = safeInitModal('gisModal');
+
+  fetchLiveTelemetry();
+  setInterval(fetchLiveTelemetry, 3000);
+});
