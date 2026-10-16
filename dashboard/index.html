@@ -23,6 +23,8 @@
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border-color: #e2e8f0;
+      --drawer-btn-bg: #ffffff;
+      --drawer-btn-text: #1e293b;
     }
 
     body.dark-mode {
@@ -31,6 +33,8 @@
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --border-color: #334155;
+      --drawer-btn-bg: #151e2e;
+      --drawer-btn-text: #f1f5f9;
     }
 
     html, body {
@@ -42,7 +46,7 @@
       background-color: var(--bg-canvas);
       color: var(--text-main);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: background-color 0.25s ease, color 0.25s ease;
       touch-action: manipulation;
     }
 
@@ -54,13 +58,13 @@
       color: var(--text-main);
     }
 
-    /* Complete Dark Mode Text & Contrast Overrides */
+    /* Strict Dark Mode Text & Container Contrast Overrides */
     body.dark-mode .card,
     body.dark-mode .modal-content,
     body.dark-mode .offcanvas {
-      background-color: var(--card-bg);
+      background-color: var(--card-bg) !important;
       color: #f8fafc !important;
-      border-color: var(--border-color);
+      border-color: var(--border-color) !important;
     }
 
     body.dark-mode .text-secondary,
@@ -81,6 +85,48 @@
       color: #f8fafc !important;
     }
 
+    /* Dark Mode Banner Fix: Replaces unreadable pink with high-contrast alert styling */
+    body.dark-mode #alertBanner.alert-danger {
+      background-color: rgba(239, 68, 68, 0.16) !important;
+      color: #fca5a5 !important;
+      border: 1px solid rgba(239, 68, 68, 0.35) !important;
+    }
+    body.dark-mode #alertBanner.alert-warning {
+      background-color: rgba(245, 158, 11, 0.16) !important;
+      color: #fcd34d !important;
+      border: 1px solid rgba(245, 158, 11, 0.35) !important;
+    }
+    body.dark-mode #alertBanner.alert-success {
+      background-color: rgba(16, 185, 129, 0.16) !important;
+      color: #6ee7b7 !important;
+      border: 1px solid rgba(16, 185, 129, 0.35) !important;
+    }
+
+    /* Drawer Action Buttons: High Contrast in Both Modes */
+    .drawer-action-btn {
+      background-color: var(--drawer-btn-bg);
+      color: var(--drawer-btn-text) !important;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.55rem 0.75rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    .drawer-action-btn:hover,
+    .drawer-action-btn:active {
+      background-color: rgba(2, 132, 199, 0.12);
+      border-color: #0284c7;
+      color: #38bdf8 !important;
+    }
+
+    body.dark-mode .btn-close {
+      filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
     body.dark-mode .modal-header,
     body.dark-mode .modal-footer {
       border-color: #334155;
@@ -98,12 +144,28 @@
       color: #f8fafc !important;
     }
 
+    /* Symmetrical App Header Grid */
+    .app-header-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .app-title-cluster {
+      min-width: 0;
+    }
+    .app-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
     .stat-card {
       border-left: 4px solid var(--border-color);
       cursor: pointer;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-
     .stat-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -112,14 +174,12 @@
     .safe-periphery { border-left-color: #10b981 !important; }
     .danger-periphery { border-left-color: #ef4444 !important; }
 
-    /* Fluid responsive font scaling for metric numbers */
     .metric-val {
-      font-size: clamp(1.4rem, 5vw, 2.2rem);
+      font-size: clamp(1.45rem, 5.2vw, 2.2rem);
       font-weight: 700;
       line-height: 1.1;
     }
 
-    /* Horizontal scroll track for station pills without breaking page layout */
     .pill-scroll-container {
       display: flex;
       gap: 0.5rem;
@@ -139,7 +199,7 @@
       background: #475569;
     }
 
-    /* Hydraulic Stream Track & Continuous Flowing Animation */
+    /* Hydraulic Stream Track */
     .pipe-track {
       width: 100%;
       height: 12px;
@@ -149,7 +209,6 @@
       position: relative;
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
     }
-
     body.dark-mode .pipe-track {
       background-color: #334155;
     }
@@ -167,33 +226,13 @@
     }
 
     .flow-cyan {
-      background-image: repeating-linear-gradient(
-        45deg,
-        #06b6d4,
-        #06b6d4 10px,
-        #0891b2 10px,
-        #0891b2 20px
-      );
+      background-image: repeating-linear-gradient(45deg, #06b6d4, #06b6d4 10px, #0891b2 10px, #0891b2 20px);
     }
-
     .flow-amber {
-      background-image: repeating-linear-gradient(
-        45deg,
-        #f59e0b,
-        #f59e0b 10px,
-        #d97706 10px,
-        #d97706 20px
-      );
+      background-image: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 10px, #d97706 10px, #d97706 20px);
     }
-
     .flow-red {
-      background-image: repeating-linear-gradient(
-        45deg,
-        #ef4444,
-        #ef4444 10px,
-        #dc2626 10px,
-        #dc2626 20px
-      );
+      background-image: repeating-linear-gradient(45deg, #ef4444, #ef4444 10px, #dc2626 10px, #dc2626 20px);
     }
 
     .sparkline-box {
@@ -206,44 +245,32 @@
       width: 100%;
       border-radius: 8px;
     }
-
-    /* Mobile schematic layout adaptation */
-    @media (max-width: 576px) {
-      .schematic-labels {
-        font-size: 0.7rem !important;
-      }
-      .stat-card {
-        padding: 0.75rem !important;
-      }
-      .card-composite-title {
-        font-size: 0.75rem !important;
-      }
-    }
   </style>
 </head>
 <body class="p-2 p-md-4">
   <div class="container-fluid max-w-7xl px-1 px-md-3">
     
-    <!-- Top Header -->
-    <header class="d-flex justify-content-between align-items-center pb-2 pb-md-3 mb-2 mb-md-3 border-bottom">
-      <div>
-        <h1 class="h4 h3-md fw-bold mb-0 text-primary d-flex align-items-center gap-2">
-          <span>JalDrishti(H₂O)</span>
-          <span class="badge bg-primary d-none d-sm-inline-block fs-6 fw-normal">Jal Nigam Edge</span>
-        </h1>
-        <p id="txtHeaderSubtitle" class="text-secondary small mb-0 text-truncate" style="max-width: 260px;">Rural Jal Nigam Tank Telemetry Node</p>
+    <!-- Top Header: Symmetrical Grid -->
+    <header class="app-header-grid pb-2 pb-md-3 mb-2 mb-md-3 border-bottom">
+      <div class="app-title-cluster">
+        <div class="d-flex align-items-center gap-2">
+          <h1 class="h4 h3-md fw-bold mb-0 text-primary">JalDrishti(H₂O)</h1>
+          <span class="badge bg-primary fs-7 fw-normal d-none d-sm-inline-block">Jal Nigam Edge</span>
+        </div>
+        <p id="txtHeaderSubtitle" class="text-secondary small mb-0 text-truncate">Rural Jal Nigam Tank Telemetry Node</p>
       </div>
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1 shadow-xs" onclick="toggleLanguage()">
+
+      <div class="app-header-actions">
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1 px-2.5 py-1.5 shadow-xs" onclick="toggleLanguage()">
           <i class="bi bi-translate"></i> <span id="langMenuBadge">Language</span>
         </button>
-        <button class="btn btn-dark btn-sm d-flex align-items-center gap-1 shadow-xs" type="button" data-bs-toggle="offcanvas" data-bs-target="#appMenuOffcanvas">
-          <i class="bi bi-list"></i> <span>Menu</span>
+        <button class="btn btn-dark btn-sm d-flex align-items-center gap-1 px-2.5 py-1.5 shadow-xs" type="button" data-bs-toggle="offcanvas" data-bs-target="#appMenuOffcanvas">
+          <i class="bi bi-list fs-6"></i> <span>Menu</span>
         </button>
       </div>
     </header>
 
-    <!-- Top Station Navigation Pills -->
+    <!-- Station Selection Navigation Pills -->
     <div class="pill-scroll-container mb-3">
       <button id="pillNode0" class="btn btn-sm btn-primary text-nowrap py-1 px-3 rounded-pill shadow-xs" onclick="selectClusterNode(0)">🚰 Lucknow (Main Tank-1)</button>
       <button id="pillNode1" class="btn btn-sm btn-outline-secondary text-nowrap py-1 px-3 rounded-pill shadow-xs" onclick="selectClusterNode(1)">🚰 Lucknow (Main Tank-2)</button>
@@ -251,19 +278,19 @@
       <button id="pillNode3" class="btn btn-sm btn-outline-secondary text-nowrap py-1 px-3 rounded-pill shadow-xs" onclick="selectClusterNode(3)">🚰 Lucknow (Main Tank-4)</button>
     </div>
 
-    <!-- Active Contamination / Safety Banner -->
+    <!-- Live Status / Safety Alert Banner -->
     <div id="alertBanner" class="alert alert-danger d-flex justify-content-between align-items-center shadow-sm py-2 px-3 mb-3">
       <span id="statusText" class="fw-semibold small">Status: Initializing Telemetry...</span>
       <span id="modeBadge" class="badge bg-secondary">Edge Initializing</span>
     </div>
 
-    <!-- Closed-Loop Hydraulic Flow Schematic -->
+    <!-- Closed-Loop Hydraulic Remediation Stream -->
     <div class="card p-2 p-md-3 mb-3">
       <div class="d-flex justify-content-between align-items-center mb-1 mb-md-2">
         <h2 id="txtSchematicHeader" class="small fw-bold mb-0">Closed-Loop Hydraulic Stream</h2>
         <span id="flowOutletState" class="badge bg-danger">Evaluating</span>
       </div>
-      <div class="d-flex justify-content-between text-secondary small mb-1 schematic-labels text-nowrap overflow-hidden">
+      <div class="d-flex justify-content-between text-secondary small mb-1 text-nowrap overflow-hidden" style="font-size: 0.75rem;">
         <span id="txtNode1">Borewell Intake</span>
         <span id="txtNode2" class="d-none d-sm-inline">Greensand Bed <small id="txtNode2Sub" class="text-muted">(Fe Stripping)</small></span>
         <span id="txtNode3">Sensing Cell</span>
@@ -279,12 +306,12 @@
       </div>
     </div>
 
-    <!-- 6 Core Telemetry Metric Cards -->
+    <!-- 6 Primary Sensor Telemetry Cards -->
     <div class="row g-2 g-md-3 mb-3">
       <div class="col-6 col-md-4 col-xl-2">
         <div class="card p-2 p-md-3 stat-card h-100" onclick="openMetricModal('composite')">
           <div class="d-flex justify-content-between align-items-center mb-1">
-            <span id="cardCompositeTitle" class="card-composite-title text-secondary fw-semibold small">Water Quality</span>
+            <span id="cardCompositeTitle" class="text-secondary fw-semibold small">Water Quality</span>
             <button id="hpiToggleBadge" class="btn badge bg-primary border-0 p-1" style="font-size: 0.65rem;" onclick="event.stopPropagation(); toggleHpiMode();">HPI</button>
           </div>
           <div class="d-flex align-items-baseline gap-1">
@@ -397,7 +424,7 @@
       </div>
     </div>
 
-    <!-- Health Risk & Outbreak Meter -->
+    <!-- Epidemiological Health Risk Outbreak Meter -->
     <div class="card p-3 mb-3">
       <div class="d-flex justify-content-between align-items-center mb-2">
         <h2 id="txtHealthHeader" class="small fw-bold mb-0">Predictive Health Risk Warning</h2>
@@ -425,7 +452,7 @@
       </div>
     </div>
 
-    <!-- Charts Row -->
+    <!-- Longitudinal Quality Analytics Charts -->
     <div class="row g-2 g-md-3 mb-3">
       <div class="col-12 col-lg-8">
         <div class="card p-3 h-100">
@@ -455,7 +482,7 @@
       </div>
     </div>
 
-    <!-- Parameter Waveforms -->
+    <!-- Parameter Waveforms Trace -->
     <div class="card p-3 mb-3">
       <h2 id="txtTraceHeader" class="small fw-bold mb-2">Live Parameter Traces vs Standards</h2>
       <div style="height: 220px;"><canvas id="lineComparisonChart"></canvas></div>
@@ -463,15 +490,15 @@
 
   </div>
 
-  <!-- Offcanvas Navigation Drawer -->
+  <!-- Offcanvas Drawer Navigation Menu (With High-Contrast Actions) -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="appMenuOffcanvas">
     <div class="offcanvas-header border-bottom">
       <h3 class="h5 offcanvas-title fw-bold text-primary">JalDrishti Navigation</h3>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
-    <div class="offcanvas-body d-flex flex-column gap-3">
+    <div class="offcanvas-body d-flex flex-column gap-2.5">
       <div>
-        <label id="txtMenuClusterTitle" class="form-label small fw-bold text-secondary text-uppercase">Active Jal Nigam Tank Node</label>
+        <label id="txtMenuClusterTitle" class="form-label small fw-bold text-secondary text-uppercase mb-1">Active Jal Nigam Tank Node</label>
         <select class="form-select form-select-sm" id="nodeSelectMenu" onchange="selectClusterNode(this.value)">
           <option value="0" id="optNode0">Lucknow (Main Tank-1)</option>
           <option value="1" id="optNode1">Lucknow (Main Tank-2)</option>
@@ -480,47 +507,47 @@
         </select>
       </div>
 
-      <hr class="my-0">
+      <hr class="my-1">
       <span id="txtMenuOpsHeader" class="small fw-bold text-secondary text-uppercase">Operations & Preferences</span>
 
-      <button class="btn btn-outline-secondary btn-sm d-flex justify-content-between align-items-center" onclick="toggleLanguage()">
-        <span id="txtMenuLangTitle"><i class="bi bi-translate me-2"></i>Language</span>
+      <button class="drawer-action-btn" onclick="toggleLanguage()">
+        <span id="txtMenuLangTitle"><i class="bi bi-translate text-primary me-2"></i>Language</span>
         <span id="langMenuBadgeDrawer" class="badge bg-primary">EN</span>
       </button>
 
-      <button class="btn btn-outline-danger btn-sm d-flex justify-content-between align-items-center" onclick="triggerMenuVoiceAdvisory()">
-        <span id="txtMenuVoiceTitle"><i class="bi bi-megaphone me-2"></i>Panchayat IVRS Voice</span>
+      <button class="drawer-action-btn" onclick="triggerMenuVoiceAdvisory()">
+        <span id="txtMenuVoiceTitle"><i class="bi bi-megaphone text-danger me-2"></i>Panchayat IVRS Voice</span>
         <span id="menuVoiceBadge" class="badge bg-danger">Broadcast</span>
       </button>
 
-      <button class="btn btn-outline-success btn-sm d-flex justify-content-between align-items-center" onclick="dispatchWhatsAppAlert()">
-        <span id="txtMenuWa"><i class="bi bi-whatsapp me-2"></i>Alert Panchayat</span>
+      <button class="drawer-action-btn" onclick="dispatchWhatsAppAlert()">
+        <span id="txtMenuWa"><i class="bi bi-whatsapp text-success me-2"></i>Alert Panchayat</span>
         <span id="menuWaBadge" class="badge bg-success">WhatsApp</span>
       </button>
 
-      <button class="btn btn-outline-info btn-sm d-flex justify-content-between align-items-center text-dark" onclick="openGisModal()">
-        <span id="txtMenuGis"><i class="bi bi-geo-alt me-2"></i>GIS Habitation Tank Grid</span>
+      <button class="drawer-action-btn" onclick="openGisModal()">
+        <span id="txtMenuGis"><i class="bi bi-geo-alt text-info me-2"></i>GIS Habitation Tank Grid</span>
         <span id="menuGisBadge" class="badge bg-info text-dark">Map</span>
       </button>
 
-      <button class="btn btn-outline-primary btn-sm d-flex justify-content-between align-items-center" onclick="openRecordsModal()">
-        <span id="txtMenuRecords"><i class="bi bi-table me-2"></i>Operational Records Log</span>
+      <button class="drawer-action-btn" onclick="openRecordsModal()">
+        <span id="txtMenuRecords"><i class="bi bi-table text-primary me-2"></i>Operational Records Log</span>
         <span id="txtMenuViewTable" class="badge bg-primary">View</span>
       </button>
 
-      <button class="btn btn-outline-primary btn-sm d-flex justify-content-between align-items-center" onclick="generateCompliancePDF()">
-        <span id="txtMenuPdf"><i class="bi bi-file-earmark-pdf me-2"></i>Export Audit PDF</span>
-        <span class="badge bg-primary">PDF</span>
+      <button class="drawer-action-btn" onclick="generateCompliancePDF()">
+        <span id="txtMenuPdf"><i class="bi bi-file-earmark-pdf text-danger me-2"></i>Export Audit PDF</span>
+        <span class="badge bg-danger">PDF</span>
       </button>
 
-      <a id="linkDownloadCsv" href="/api/download-csv?node_id=lucknow_tank_1" class="btn btn-outline-secondary btn-sm d-flex justify-content-between align-items-center">
-        <span id="txtMenuCsv"><i class="bi bi-download me-2"></i>Download Raw CSV</span>
+      <a id="linkDownloadCsv" href="/api/download-csv?node_id=lucknow_tank_1" class="drawer-action-btn">
+        <span id="txtMenuCsv"><i class="bi bi-download text-secondary me-2"></i>Download Raw CSV</span>
         <span id="txtMenuCsvBadge" class="badge bg-secondary">CSV</span>
       </a>
 
-      <button class="btn btn-outline-secondary btn-sm d-flex justify-content-between align-items-center" onclick="toggleTheme()">
-        <span id="txtMenuDarkMode"><i class="bi bi-moon-stars me-2"></i>Dark Mode</span>
-        <span id="themeMenuLabel" class="badge bg-secondary">Off</span>
+      <button class="drawer-action-btn" onclick="toggleTheme()">
+        <span id="txtMenuDarkMode"><i class="bi bi-moon-stars text-warning me-2"></i>Dark Mode</span>
+        <span id="themeMenuLabel" class="badge bg-success">On</span>
       </button>
     </div>
   </div>
